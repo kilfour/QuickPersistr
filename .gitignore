@@ -55,3 +55,15 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+*.log
+temp*.md
+
+.quickpulse/
+.quickcheckr/
+.test-results/
+
+nuget.md
+
+DocsSinglePages/
+*.lscache
