@@ -13,7 +13,7 @@ where TEntity : class, new()
         propertyChecks.Add((a, b) => Equals(propertyInfo.GetValue(a), propertyInfo.GetValue(b)));
         return this;
     }
-    public PersistenceProperties<TEntity, TId> HasMany<TChild>(PersistenceSpecification<TChild> childSpecification, Action<TEntity, TChild> apply)
+    public PersistenceProperties<TEntity, TId> HasMany<TChild>(Persistence<TChild> childSpecification, Action<TEntity, TChild> apply)
     where TChild : class, new()
     {
         return this;

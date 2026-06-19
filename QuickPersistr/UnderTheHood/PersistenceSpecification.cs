@@ -11,6 +11,7 @@ public class PersistenceSpecification<TEntity>(
 : IPersistenceSpecification
 where TEntity : class, new()
 {
+    private readonly string entityName = typeof(TEntity).Name;
     public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope scope) =>
         [CreateCheckr(scope),
             Trackr.OneOfPool<TEntity>("Read", info => ReadCheckr(info, scope)),
@@ -30,14 +31,14 @@ where TEntity : class, new()
     private CheckrOf<Case> CreateCheckr(IPersistenceScope scope) =>
         from entity in Checkr.Input("Entity", Creator)
         from create in Checkr.Act("Create", () => { scope.Add(entity); scope.Commit(); })
-        from canCreate in Checkr.Expect("Can Create", () => primaryKeyExpression.GetValue(entity) != default)
+        from canCreate in Checkr.Expect($"{entityName} Can Create", () => primaryKeyExpression.GetValue(entity) != default)
         from stored in Trackr.ToPool("Entity", () => entity)
         select Case.Closed;
 
     private CheckrOf<Case> ReadCheckr(PoolElement<TEntity> info, IPersistenceScope scope) =>
         from entity in Checkr.Act("Read", () =>
             scope.GetById<TEntity>(primaryKeyExpression.GetValue(info.Value)))
-        from canRead in Checkr.Expect("Can Read",
+        from canRead in Checkr.Expect($"{entityName} Can Read",
             () => propertyChecks.All(a => a(info.Value, entity)))
         select Case.Closed;
 
@@ -48,7 +49,7 @@ where TEntity : class, new()
         from reloaded in Checkr.Capture(
             () => scope.GetById<TEntity>(primaryKeyExpression.GetValue(info.Value)))
         from canUpdate in Checkr.Expect(
-            "Can Update",
+            $"{entityName} Can Update",
                 () => propertyChecks.All(a => a(updatedEntity, reloaded)),
                 () => Introduce.This((updatedEntity, reloaded)))
         from stored in info.Replace(reloaded)
@@ -63,8 +64,7 @@ where TEntity : class, new()
             })
         from reloaded in Checkr.Capture(
             () => scope.GetById<TEntity>(primaryKeyExpression.GetValue(info.Value)))
-        from canDelete in Checkr.Expect("Can Delete", () => reloaded is null)
+        from canDelete in Checkr.Expect($"{entityName} Can Delete", () => reloaded is null)
         from stored in info.Remove()
         select Case.Closed;
-
 }

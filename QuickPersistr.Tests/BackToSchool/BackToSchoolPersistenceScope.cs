@@ -8,7 +8,6 @@ public class BackToSchoolPersistenceScope : IDisposable, IPersistenceScope
 {
     private readonly SqliteConnection connection;
     private readonly BackToSchoolDbContext context;
-    public BackToSchoolDbContext Context => context;
 
     public BackToSchoolPersistenceScope()
     {
@@ -41,10 +40,10 @@ public class BackToSchoolPersistenceScope : IDisposable, IPersistenceScope
     where TEntity : class
     {
         ArgumentNullException.ThrowIfNull(id);
-        var entity = Context.Set<TEntity>().Find(id);
+        var entity = context.Set<TEntity>().Find(id);
         if (entity is null)
             return;
-        Context.Set<TEntity>().Remove(entity);
+        context.Set<TEntity>().Remove(entity);
     }
 
     public void Commit()
