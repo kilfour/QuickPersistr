@@ -43,26 +43,31 @@ where TEntity : class, new()
         Func<T, bool> checkCleared,
         FuzzrOf<TChild> childFuzzr,
         IPersistenceScope scope)
-    where T : class, new() =>
-        from entity in Checkr.Capture(() => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
-        from children in Checkr.Input("Children", childFuzzr.Many(1, 3))
-        from updated in Checkr.Act("Update", () =>
-        {
-            foreach (var child in children)
+    where T : class, new()
+    {
+        var entityName = typeof(T).Name;
+        var childEntityName = typeof(TChild).Name;
+        return
+            from entity in Checkr.Capture(() => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
+            from children in Checkr.Input("Children", childFuzzr.Many(1, 3))
+            from updated in Checkr.Act("Update", () =>
             {
-                apply(entity, child);
-            }
-            scope.Commit();
-        })
-        from reloaded in Checkr.Capture(
-            () => reload(scope, primaryKeyPropertyInfo.GetValue(info.Value)))
-        from canUpdate in Checkr.Expect("Has Many", () => children.All(a => check(reloaded, a)))
-        from clearMany in Checkr.Act("Clear Many", () => { clear(reloaded); scope.Commit(); })
-        from reloadedCleared in Checkr.Capture(
-            () => reload(scope, primaryKeyPropertyInfo.GetValue(info.Value)))
-        from cleared in Checkr.Expect("Can Clear", () => checkCleared(reloadedCleared))
-        from stored in info.Replace(reloaded)
-        select Case.Closed;
+                foreach (var child in children)
+                {
+                    apply(entity, child);
+                }
+                scope.Commit();
+            })
+            from reloaded in Checkr.Capture(
+                () => reload(scope, primaryKeyPropertyInfo.GetValue(info.Value)))
+            from canUpdate in Checkr.Expect($"{entityName} Can Add {childEntityName}", () => children.All(a => check(reloaded, a)))
+            from clearMany in Checkr.Act("Clear Many", () => { clear(reloaded); scope.Commit(); })
+            from reloadedCleared in Checkr.Capture(
+                () => reload(scope, primaryKeyPropertyInfo.GetValue(info.Value)))
+            from cleared in Checkr.Expect($"{entityName} Can Clear {childEntityName}", () => checkCleared(reloadedCleared))
+            from stored in info.Replace(reloaded)
+            select Case.Closed;
+    }
 
     public PersistenceSpecification<TEntity> Persist()
         => new(primaryKeyPropertyInfo, propertyChecks, oneToManies);
