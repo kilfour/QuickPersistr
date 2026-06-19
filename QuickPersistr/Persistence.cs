@@ -1,4 +1,3 @@
-using QuickCheckr;
 using QuickPersistr.UnderTheHood;
 
 namespace QuickPersistr;

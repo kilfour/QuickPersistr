@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace QuickPersistr.Tests.BackToSchool.Model;
 
@@ -7,4 +8,11 @@ public class BackToSchoolDbContext(DbContextOptions<BackToSchoolDbContext> optio
 {
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<Student> Students => Set<Student>();
+    // protected override void OnModelCreating(ModelBuilder modelBuilder)
+    // {
+    //     modelBuilder.Entity<Course>()
+    //         .Property(c => c.Title)
+    //         .Metadata
+    //         .SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+    // }
 }
