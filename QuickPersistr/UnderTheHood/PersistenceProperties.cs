@@ -1,45 +1,32 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using QuickCheckr;
+using QuickFuzzr;
 
 namespace QuickPersistr.UnderTheHood;
 
-public class PersistenceProperties<TEntity, TId>(Expression<Func<TEntity, TId>> primaryKeyExpression)
+public class PersistenceProperties<TEntity, TId>(PropertyInfo primaryKeyPropertyInfo)
 where TEntity : class, new()
 {
     private readonly List<Func<TEntity, TEntity, bool>> propertyChecks = [];
     public PersistenceProperties<TEntity, TId> Property<TProp>(Expression<Func<TEntity, TProp>> propertyExpression)
     {
-        var propertyInfo = AsPropertyInfo(propertyExpression);
+        var propertyInfo = propertyExpression.AsPropertyInfo();
         propertyChecks.Add((a, b) => Equals(propertyInfo.GetValue(a), propertyInfo.GetValue(b)));
         return this;
     }
-    public PersistenceProperties<TEntity, TId> HasMany<TChild>(Persistence<TChild> childSpecification, Action<TEntity, TChild> apply)
+
+    private readonly List<Action<TEntity>> oneToManies = [];
+    public PersistenceProperties<TEntity, TId> HasMany<TChild>(
+        Persistence<TChild> childSpecification,
+        Action<TEntity, TChild> apply)
     where TChild : class, new()
     {
+        //void action(TEntity a) => apply(a, childSpecification.Define().GetCreator<TChild>().Generate());
+        //oneToManies.Add(action);
         return this;
     }
+
     public PersistenceSpecification<TEntity> Persist()
-        => new(AsPropertyInfo(primaryKeyExpression), propertyChecks);
-
-    private static PropertyInfo AsPropertyInfo<TProp>(Expression<Func<TEntity, TProp>> expression)
-    {
-        if (AsMemberInfo(expression) is PropertyInfo propertyInfo)
-            return propertyInfo;
-        throw new ArgumentException($"Expression '{expression}' does not refer to a field or property.");
-    }
-
-    private static MemberInfo AsMemberInfo<TTarget, TMember>(Expression<Func<TTarget, TMember>> expression)
-    {
-        if (expression.Body is MemberExpression memberExpr)
-        {
-            return memberExpr.Member;
-        }
-
-        if (expression.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember)
-        {
-            return unaryMember.Member;
-        }
-
-        throw new ArgumentException($"Expression '{expression}' does not refer to a field or property.");
-    }
+        => new(primaryKeyPropertyInfo, propertyChecks);
 }

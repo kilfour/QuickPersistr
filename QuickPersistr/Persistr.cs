@@ -30,13 +30,18 @@ public class PersisterRunner(
 {
     public void Run()
     {
-        GetCheckr()
+        var specifications = entities.Select(a => a.Define()).ToList();
+        var count = specifications.Sum(a => a.CheckrCount);
+
+        GetCheckr(specifications)
             .Configure(a => a with { FileAs = name })
-            .Run(1.Runs(), (entities.Length * 4).ExecutionsPerRun());
+            .Run(1.Runs(), count.ExecutionsPerRun());
     }
 
-    public CheckrOf<Case> GetCheckr() =>
-        from scope in Trackr.Stashed(scopeFactory)
-        from _ in Checkr.Sequence([.. entities.SelectMany(a => a.Define().ToCheckrs(scope))])
-        select Case.Closed;
+    public CheckrOf<Case> GetCheckr(List<IPersistenceSpecification> specifications)
+    {
+        return from scope in Trackr.Stashed(scopeFactory)
+               from _ in Checkr.Sequence([.. specifications.SelectMany(a => a.ToCheckrs(scope))])
+               select Case.Closed;
+    }
 }

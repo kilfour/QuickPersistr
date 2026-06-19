@@ -6,6 +6,6 @@ public class PersistencePrimaryKey<TEntity>
 where TEntity : class, new()
 {
     public PersistenceProperties<TEntity, TId> PrimaryKey<TId>(Expression<Func<TEntity, TId>> primaryKeyExpression)
-        => new(primaryKeyExpression);
+        => new(primaryKeyExpression.AsPropertyInfo());
 
 }
