@@ -1,8 +1,13 @@
+using QuickCheckr;
 using QuickPersistr.UnderTheHood;
 
 namespace QuickPersistr;
 
-public abstract class Persistence<TEntity>
+public interface IPersistence
+{
+    public IPersistenceSpecification Define();
+}
+public abstract class Persistence<TEntity> : IPersistence
 where TEntity : class, new()
 {
     public abstract IPersistenceSpecification Define();

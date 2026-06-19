@@ -4,5 +4,5 @@ namespace QuickPersistr;
 
 public interface IPersistenceSpecification
 {
-    public CheckrOf<Case> GetCheckr(Func<IPersistenceScope> scopeFactory);
+    public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope scope);
 }

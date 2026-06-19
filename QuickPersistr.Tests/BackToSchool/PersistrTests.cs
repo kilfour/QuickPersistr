@@ -8,9 +8,11 @@ public class PersistrTests
     [Fact]
     public void FromClass()
     {
-        new CoursePersistence().Define().GetCheckr(() => new BackToSchoolPersistenceScope())
-            .Configure(a => a with { FileAs = "FromClass" })
-            .Run(4.ExecutionsPerRun());
+        Persistr
+            .Named("BackToSchool")
+            .Scope(() => new BackToSchoolPersistenceScope())
+            .Entities(new CoursePersistence())
+            .Run();
     }
 
     public class CoursePersistence : Persistence<Course>
@@ -19,6 +21,7 @@ public class PersistrTests
             Entity
                 .PrimaryKey(a => a.Id)
                 .Property(a => a.Title)
+                .Property(a => a.Description)
                 .Persist();
     }
 }
