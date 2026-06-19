@@ -4,7 +4,7 @@ using QuickPersistr.Tests.BackToSchool.Model;
 
 namespace QuickPersistr.Tests.BackToSchool;
 
-public class BackToSchoolPersistenceScope : IDisposable
+public class BackToSchoolPersistenceScope : IDisposable, IPersistenceScope
 {
     private readonly SqliteConnection connection;
     private readonly BackToSchoolDbContext context;
@@ -27,7 +27,27 @@ public class BackToSchoolPersistenceScope : IDisposable
         connection.Dispose();
     }
 
-    public void SaveAndClear()
+    public TEntity GetById<TEntity>(object? id)
+    where TEntity : class, new()
+        => context.Find<TEntity>(id)!;
+
+    public TEntity Add<TEntity>(TEntity entity)
+    {
+        context.Add(entity!);
+        return entity;
+    }
+
+    public void DeleteById<TEntity>(object? id)
+    where TEntity : class
+    {
+        ArgumentNullException.ThrowIfNull(id);
+        var entity = Context.Set<TEntity>().Find(id);
+        if (entity is null)
+            return;
+        Context.Set<TEntity>().Remove(entity);
+    }
+
+    public void Commit()
     {
         context.SaveChanges();
         context.ChangeTracker.Clear();

@@ -4,5 +4,5 @@ namespace QuickPersistr;
 
 public static class Persistr
 {
-    public static PersistrScope Named(string name) => new(name);
+    // public static PersistrScope Named(string name) => new(name);
 }
