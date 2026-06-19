@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using QuickPersistr.Tests.BackToSchool.Model;
 
 namespace QuickPersistr.Tests.BackToSchool;
@@ -23,8 +24,14 @@ public class PersistrTests
                 .PrimaryKey(a => a.Id)
                 .Property(a => a.Title)
                 .Property(a => a.Description)
-                // HasMany not yet functional
-                .HasMany(new StudentPersistence(), (a, b) => a.Students.Add(b))
+                .HasMany(
+                    new StudentPersistence(),
+                    (a, b) => a.Students.Add(b),
+                    (a, b) => a.Students.Any(c => c.Id == b.Id),
+                    (a, b) => a.Query<BackToSchoolDbContext, Course>(
+                        c => c.Set<Course>().Include(d => d.Students).Single(e => e.Id == (int)b!)),
+                    a => a.Students.Clear(),
+                    a => a.Students.Count == 0)
                 .Persist();
     }
 

@@ -7,23 +7,39 @@ namespace QuickPersistr.UnderTheHood;
 
 public class PersistenceSpecification<TEntity>(
     PropertyInfo primaryKeyPropertyInfo,
-    List<Func<TEntity, TEntity, bool>> propertyChecks)
+    List<Func<TEntity, TEntity, bool>> propertyChecks,
+    List<Func<IPersistenceScope, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies)
 : IPersistenceSpecification
 where TEntity : class, new()
 {
     private readonly string entityName = typeof(TEntity).Name;
+
+    public int CheckrCount => 4 + oneToManies.Count;
+
+    public FuzzrOf<T> GetCreator<T>()
+    where T : class, new()
+        => Creator.Select(a => (a as T)!);
+
     public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope scope) =>
-        [CreateCheckr(scope),
-            Trackr.OneOfPool<TEntity>("Read", info => ReadCheckr(info, scope)),
-            Trackr.OneOfPool<TEntity>("Update", info => UpdateCheckr(scope, info)),
-            Trackr.OneOfPool<TEntity>("Delete", info => DeleteCheckr(scope, info))];
+        [.. CruCheckrs(scope), .. OneToManyCheckrs(scope), .. DeleteCheckr(scope)];
+
+    private IList<CheckrOf<Case>> CruCheckrs(IPersistenceScope scope) => [
+        CreateCheckr(scope),
+        Trackr.OneOfPool<TEntity>("Read", info => ReadCheckr(info, scope)),
+        Trackr.OneOfPool<TEntity>("Update", info => UpdateCheckr(scope, info))];
+
+    private IList<CheckrOf<Case>> OneToManyCheckrs(IPersistenceScope scope) =>
+        [.. oneToManies.Select(a =>
+            Trackr.OneOfPool<TEntity>("Has Many", info
+                => a(scope,info)))];
+
+    private IList<CheckrOf<Case>> DeleteCheckr(IPersistenceScope scope) => [
+        Trackr.OneOfPool<TEntity>("Delete", info => DeleteCheckr(scope, info))];
 
     private readonly FuzzrOf<TEntity> Creator =
         from ignore in Configr.Ignore(a => a == primaryKeyPropertyInfo)
         from entity in Fuzzr.One<TEntity>()
         select entity;
-
-    public int CheckrCount => 4;
 
     private FuzzrOf<TEntity> Modifier(TEntity course) =>
         from ignore in Configr.Ignore(a => a == primaryKeyPropertyInfo)
@@ -79,7 +95,7 @@ where TEntity : class, new()
     where T : class, new() =>
         from entity in Checkr.Capture(() => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
         from children in Checkr.Input("Children", childFuzzr.Many(1, 3))
-        from updated in Checkr.Act("Update", () =>
+        from updated in Checkr.Act("Add Many", () =>
         {
             foreach (var child in children)
             {

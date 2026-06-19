@@ -1,4 +1,5 @@
 using QuickCheckr;
+using QuickCheckr.UnderTheHood.Proceedings.ClerksOffice;
 
 namespace QuickPersistr;
 
@@ -34,7 +35,7 @@ public class PersisterRunner(
         var count = specifications.Sum(a => a.CheckrCount);
 
         GetCheckr(specifications)
-            .Configure(a => a with { FileAs = name })
+            .Configure(a => a with { FileAs = name, Clerk = CourtClerk.Default().WithStackTrace() })
             .Run(1.Runs(), count.ExecutionsPerRun());
     }
 
