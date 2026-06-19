@@ -29,7 +29,7 @@ public class PersistrTests
                     (a, b) => a.Students.Add(b),
                     (a, b) => a.Students.Any(c => c.Id == b.Id),
                     (a, b) => a.Query<BackToSchoolDbContext, Course>(
-                        c => c.Set<Course>().Include(d => d.Students).Single(e => e.Id == (int)b!)),
+                        c => c.Set<Course>().Include(d => d.Students).Single(e => e.Id == b)),
                     a => a.Students.Clear(),
                     a => a.Students.Count == 0)
                 .Persist();

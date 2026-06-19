@@ -21,7 +21,7 @@ where TEntity : class, new()
         Persistence<TChild> childPersistence,
         Action<TEntity, TChild> apply,
         Func<TEntity, TChild, bool> check,
-        Func<IPersistenceScope, object?, TEntity> reload,
+        Func<IPersistenceScope, TId, TEntity> reload,
         Action<TEntity> clear,
         Func<TEntity, bool> checkCleared)
     where TChild : class, new()
@@ -38,7 +38,7 @@ where TEntity : class, new()
         PoolElement<T> info,
         Action<T, TChild> apply,
         Func<T, TChild, bool> check,
-        Func<IPersistenceScope, object?, T> reload,
+        Func<IPersistenceScope, TId, T> reload,
         Action<T> clear,
         Func<T, bool> checkCleared,
         FuzzrOf<TChild> childFuzzr,
@@ -48,7 +48,8 @@ where TEntity : class, new()
         var entityName = typeof(T).Name;
         var childEntityName = typeof(TChild).Name;
         return
-            from entity in Checkr.Capture(() => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
+            from id in Checkr.Capture(() => (TId)primaryKeyPropertyInfo.GetValue(info.Value)!)
+            from entity in Checkr.Capture(() => scope.GetById<T>(id))
             from children in Checkr.Input("Children", childFuzzr.Many(1, 3))
             from updated in Checkr.Act("Update", () =>
             {
@@ -59,11 +60,11 @@ where TEntity : class, new()
                 scope.Commit();
             })
             from reloaded in Checkr.Capture(
-                () => reload(scope, primaryKeyPropertyInfo.GetValue(info.Value)))
+                () => reload(scope, id))
             from canUpdate in Checkr.Expect($"{entityName} Can Add {childEntityName}", () => children.All(a => check(reloaded, a)))
             from clearMany in Checkr.Act("Clear Many", () => { clear(reloaded); scope.Commit(); })
             from reloadedCleared in Checkr.Capture(
-                () => reload(scope, primaryKeyPropertyInfo.GetValue(info.Value)))
+                () => reload(scope, id))
             from cleared in Checkr.Expect($"{entityName} Can Clear {childEntityName}", () => checkCleared(reloadedCleared))
             from stored in info.Replace(reloaded)
             select Case.Closed;

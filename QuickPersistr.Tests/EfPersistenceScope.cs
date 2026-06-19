@@ -62,7 +62,15 @@ where TDbContext : DbContext
         => (context as TContext)!;
 
     public TEntity Query<TContext, TEntity>(Func<TContext, TEntity> query)
-     where TContext : class
-     where TEntity : class, new()
+    where TContext : class
+    where TEntity : class, new()
         => query(GetContext<TContext>());
+
+    public EfReader<TDbContext> GetReader() => new(context);
+}
+
+public class EfReader<TDbContext>(TDbContext context)
+{
+    public TEntity Query<TEntity>(Func<TDbContext, TEntity> query)
+        => query(context);
 }
