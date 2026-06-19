@@ -5,23 +5,23 @@ using QuickFuzzr;
 
 namespace QuickPersistr.UnderTheHood;
 
-public class PersistenceProperties<TEntity, TId>(PropertyInfo primaryKeyPropertyInfo)
+public class PersistenceProperties<TReader, TEntity, TId>(PropertyInfo primaryKeyPropertyInfo)
 where TEntity : class, new()
 {
     private readonly List<Func<TEntity, TEntity, bool>> propertyChecks = [];
-    public PersistenceProperties<TEntity, TId> Property<TProp>(Expression<Func<TEntity, TProp>> propertyExpression)
+    public PersistenceProperties<TReader, TEntity, TId> Property<TProp>(Expression<Func<TEntity, TProp>> propertyExpression)
     {
         var propertyInfo = propertyExpression.AsPropertyInfo();
         propertyChecks.Add((a, b) => Equals(propertyInfo.GetValue(a), propertyInfo.GetValue(b)));
         return this;
     }
 
-    private readonly List<Func<IPersistenceScope, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies = [];
-    public PersistenceProperties<TEntity, TId> HasMany<TChild>(
-        Persistence<TChild> childPersistence,
+    private readonly List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies = [];
+    public PersistenceProperties<TReader, TEntity, TId> HasMany<TChild>(
+        Persistence<TReader, TChild> childPersistence,
         Action<TEntity, TChild> apply,
         Func<TEntity, TChild, bool> check,
-        Func<IPersistenceScope, TId, TEntity> reload,
+        Func<IPersistenceReader<TReader>, TId, TEntity> reload,
         Action<TEntity> clear,
         Func<TEntity, bool> checkCleared)
     where TChild : class, new()
@@ -38,11 +38,11 @@ where TEntity : class, new()
         PoolElement<T> info,
         Action<T, TChild> apply,
         Func<T, TChild, bool> check,
-        Func<IPersistenceScope, TId, T> reload,
+        Func<IPersistenceReader<TReader>, TId, T> reload,
         Action<T> clear,
         Func<T, bool> checkCleared,
         FuzzrOf<TChild> childFuzzr,
-        IPersistenceScope scope)
+        IPersistenceScope<TReader> scope)
     where T : class, new()
     {
         var entityName = typeof(T).Name;
@@ -60,16 +60,16 @@ where TEntity : class, new()
                 scope.Commit();
             })
             from reloaded in Checkr.Capture(
-                () => reload(scope, id))
+                () => reload(scope.Reader, id))
             from canUpdate in Checkr.Expect($"{entityName} Can Add {childEntityName}", () => children.All(a => check(reloaded, a)))
             from clearMany in Checkr.Act("Clear Many", () => { clear(reloaded); scope.Commit(); })
             from reloadedCleared in Checkr.Capture(
-                () => reload(scope, id))
+                () => reload(scope.Reader, id))
             from cleared in Checkr.Expect($"{entityName} Can Clear {childEntityName}", () => checkCleared(reloadedCleared))
             from stored in info.Replace(reloaded)
             select Case.Closed;
     }
 
-    public PersistenceSpecification<TEntity> Persist()
+    public PersistenceSpecification<TReader, TEntity> Persist()
         => new(primaryKeyPropertyInfo, propertyChecks, oneToManies);
 }

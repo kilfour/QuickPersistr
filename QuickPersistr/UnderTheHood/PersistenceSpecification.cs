@@ -5,11 +5,11 @@ using QuickPulse.Show;
 
 namespace QuickPersistr.UnderTheHood;
 
-public class PersistenceSpecification<TEntity>(
+public class PersistenceSpecification<TReader, TEntity>(
     PropertyInfo primaryKeyPropertyInfo,
     List<Func<TEntity, TEntity, bool>> propertyChecks,
-    List<Func<IPersistenceScope, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies)
-: IPersistenceSpecification
+    List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies)
+: IPersistenceSpecification<TReader>
 where TEntity : class, new()
 {
     private readonly string entityName = typeof(TEntity).Name;
@@ -20,7 +20,7 @@ where TEntity : class, new()
     where T : class, new()
         => Creator.Select(a => (a as T)!);
 
-    public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope scope) =>
+    public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope<TReader> scope) =>
         [.. CruCheckrs(scope), .. OneToManyCheckrs(scope), .. DeleteCheckr(scope)];
 
     private IList<CheckrOf<Case>> CruCheckrs(IPersistenceScope scope) => [
@@ -28,7 +28,7 @@ where TEntity : class, new()
         Trackr.OneOfPool<TEntity>("Read", info => ReadCheckr(info, scope)),
         Trackr.OneOfPool<TEntity>("Update", info => UpdateCheckr(scope, info))];
 
-    private IList<CheckrOf<Case>> OneToManyCheckrs(IPersistenceScope scope) =>
+    private IList<CheckrOf<Case>> OneToManyCheckrs(IPersistenceScope<TReader> scope) =>
         [.. oneToManies.Select(a =>
             Trackr.OneOfPool<TEntity>("Has Many", info
                 => a(scope,info)))];

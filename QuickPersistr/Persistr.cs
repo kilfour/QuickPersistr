@@ -10,24 +10,24 @@ public static class Persistr
 
 public class PersistrBuilderScope(string name)
 {
-    public PersisterBuilderEntities Scope(Func<IPersistenceScope> scopeFactory)
+    public PersisterBuilderEntities<TReader> Scope<TReader>(Func<IPersistenceScope<TReader>> scopeFactory)
         => new(name, scopeFactory);
 }
 
 
-public class PersisterBuilderEntities(
+public class PersisterBuilderEntities<TReader>(
     string name,
-    Func<IPersistenceScope> scopeFactory)
+    Func<IPersistenceScope<TReader>> scopeFactory)
 {
-    public PersisterRunner Entities(params IPersistence[] entities)
+    public PersisterRunner<TReader> Entities(params IPersistence<TReader>[] entities)
         => new(name, scopeFactory, entities);
 }
 
 
-public class PersisterRunner(
+public class PersisterRunner<TReader>(
     string name,
-    Func<IPersistenceScope> scopeFactory,
-    IPersistence[] entities)
+    Func<IPersistenceScope<TReader>> scopeFactory,
+    IPersistence<TReader>[] entities)
 {
     public void Run()
     {
@@ -39,7 +39,7 @@ public class PersisterRunner(
             .Run(1.Runs(), count.ExecutionsPerRun());
     }
 
-    public CheckrOf<Case> GetCheckr(List<IPersistenceSpecification> specifications)
+    public CheckrOf<Case> GetCheckr(List<IPersistenceSpecification<TReader>> specifications)
     {
         return from scope in Trackr.Stashed(scopeFactory)
                from _ in Checkr.Sequence([.. specifications.SelectMany(a => a.ToCheckrs(scope))])

@@ -8,3 +8,9 @@ public class BackToSchoolPersistenceScope : EfPersistenceScope<BackToSchoolDbCon
 {
     public BackToSchoolPersistenceScope() : base(a => new BackToSchoolDbContext(a)) { }
 }
+
+public abstract class BackToSchoolPersistence<TEntity>
+    : Persistence<BackToSchoolDbContext, TEntity>
+    where TEntity : class, new()
+{
+}

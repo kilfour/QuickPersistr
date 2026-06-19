@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuickPersistr.Tests;
 
-public class EfPersistenceScope<TDbContext> : IDisposable, IPersistenceScope
+public class EfPersistenceScope<TDbContext> : IDisposable, IPersistenceScope<TDbContext>
 where TDbContext : DbContext
 {
     private readonly SqliteConnection connection;
@@ -26,15 +26,11 @@ where TDbContext : DbContext
         connection.Dispose();
     }
 
+    public IPersistenceReader<TDbContext> Reader => new EfReader<TDbContext>(context);
+
     public TEntity GetById<TEntity>(object? id)
     where TEntity : class, new()
         => context.Find<TEntity>(id)!;
-
-
-    public TEntity Query<TEntity>(object? id) where TEntity : class, new()
-    {
-        throw new NotImplementedException();
-    }
 
     public TEntity Add<TEntity>(TEntity entity)
     {
@@ -58,18 +54,10 @@ where TDbContext : DbContext
         context.ChangeTracker.Clear();
     }
 
-    public TContext GetContext<TContext>() where TContext : class
-        => (context as TContext)!;
-
-    public TEntity Query<TContext, TEntity>(Func<TContext, TEntity> query)
-    where TContext : class
-    where TEntity : class, new()
-        => query(GetContext<TContext>());
-
     public EfReader<TDbContext> GetReader() => new(context);
 }
 
-public class EfReader<TDbContext>(TDbContext context)
+public class EfReader<TDbContext>(TDbContext context) : IPersistenceReader<TDbContext>
 {
     public TEntity Query<TEntity>(Func<TDbContext, TEntity> query)
         => query(context);

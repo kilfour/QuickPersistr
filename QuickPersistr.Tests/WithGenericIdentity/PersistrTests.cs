@@ -38,9 +38,9 @@ public class PersistrTests
             .Run();
     }
 
-    public class ThingamajigPersistence : Persistence<Thingamajig>
+    public class ThingamajigPersistence : Persistence<GenericIdentityDbContext, Thingamajig>
     {
-        public override IPersistenceSpecification Define() =>
+        public override IPersistenceSpecification<GenericIdentityDbContext> Define() =>
             Entity
                 .PrimaryKey(a => a.Id)
                 .Property(a => a.Description)
