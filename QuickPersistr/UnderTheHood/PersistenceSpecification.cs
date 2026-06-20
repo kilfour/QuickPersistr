@@ -1,5 +1,6 @@
 using System.Reflection;
 using QuickCheckr;
+using QuickCheckr.UnderTheHood;
 using QuickFuzzr;
 using QuickPulse.Show;
 
@@ -7,7 +8,7 @@ namespace QuickPersistr.UnderTheHood;
 
 public class PersistenceSpecification<TReader, TEntity>(
     PropertyInfo primaryKeyPropertyInfo,
-    List<Func<TEntity, TEntity, bool>> propertyChecks,
+    List<PropertyCheck<TEntity>> propertyChecks,
     List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies)
 : IPersistenceSpecification<TReader>
 where TEntity : class, new()
@@ -25,16 +26,16 @@ where TEntity : class, new()
 
     private IList<CheckrOf<Case>> CruCheckrs(IPersistenceScope scope) => [
         CreateCheckr(scope),
-        Trackr.OneOfPool<TEntity>("Read", info => ReadCheckr(info, scope)),
-        Trackr.OneOfPool<TEntity>("Update", info => UpdateCheckr(scope, info))];
+        Trackr.OneOfPool<TEntity>("Entity", info => ReadCheckr(info, scope)),
+        Trackr.OneOfPool<TEntity>("Entity", info => UpdateCheckr(scope, info))];
 
     private IList<CheckrOf<Case>> OneToManyCheckrs(IPersistenceScope<TReader> scope) =>
         [.. oneToManies.Select(a =>
-            Trackr.OneOfPool<TEntity>("Has Many", info
+            Trackr.OneOfPool<TEntity>("Entity", info
                 => a(scope,info)))];
 
     private IList<CheckrOf<Case>> DeleteCheckr(IPersistenceScope scope) => [
-        Trackr.OneOfPool<TEntity>("Delete", info => DeleteCheckr(scope, info))];
+        Trackr.OneOfPool<TEntity>("Entity", info => DeleteCheckr(scope, info))];
 
     private readonly FuzzrOf<TEntity> Creator =
         from ignore in Configr.Ignore(a => a == primaryKeyPropertyInfo)
@@ -48,33 +49,40 @@ where TEntity : class, new()
 
     private CheckrOf<Case> CreateCheckr(IPersistenceScope scope) =>
         from entity in Checkr.Input("Entity", Creator)
-        from create in Checkr.Act("Create", () => { scope.Add(entity); scope.Commit(); })
-        from canCreate in Checkr.Expect($"{entityName} Can Create", () => primaryKeyPropertyInfo.GetValue(entity) != default)
+        from create in Checkr.Act($"Create {entityName}", () => { scope.Add(entity); scope.Commit(); })
+        from canCreate in Checkr.Expect($"Can Create {entityName}", () => primaryKeyPropertyInfo.GetValue(entity) != default)
         from stored in Trackr.ToPool("Entity", () => entity)
         select Case.Closed;
 
     private CheckrOf<Case> ReadCheckr(PoolElement<TEntity> info, IPersistenceScope scope) =>
-        from entity in Checkr.Act("Read", () =>
+        from entity in Checkr.Act($"Read {entityName}", () =>
             scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
-        from canRead in Checkr.Expect($"{entityName} Can Read",
-            () => propertyChecks.All(a => a(info.Value, entity)))
+        from canRead in Combine.Checkrs(
+            propertyChecks.Select(a =>
+                Checkr.Expect($"Can Read {entityName}.{a.Name}", () => a.Check(info.Value, entity),
+                () => [
+                        $"Expected: {a.GetValue(info.Value)}",
+                        $"Actual:   {a.GetValue(entity)}"])))
         select Case.Closed;
 
     private CheckrOf<Case> UpdateCheckr(IPersistenceScope scope, PoolElement<TEntity> info) =>
         from entity in Checkr.Capture(() => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
         from updatedEntity in Checkr.Input("Updated Entity", Modifier(entity))
-        from updated in Checkr.Act("Update", scope.Commit)
+        from updated in Checkr.Act($"Update {entityName}", scope.Commit)
         from reloaded in Checkr.Capture(
             () => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
-        from canUpdate in Checkr.Expect(
-            $"{entityName} Can Update",
-                () => propertyChecks.All(a => a(updatedEntity, reloaded)),
-                () => Introduce.This((updatedEntity, reloaded)))
+        from canRead in Combine.Checkrs(
+            propertyChecks.Select(a =>
+                Checkr.Expect($"Can Update {entityName}.{a.Name}",
+                    () => a.Check(updatedEntity, reloaded),
+                    () => [
+                        $"Expected: {a.GetValue(updatedEntity)}",
+                        $"Actual:   {a.GetValue(reloaded)}"])))
         from stored in info.Replace(reloaded)
         select Case.Closed;
 
     private CheckrOf<Case> DeleteCheckr(IPersistenceScope scope, PoolElement<TEntity> info) =>
-        from delete in Checkr.Act("Delete",
+        from delete in Checkr.Act($"Delete {entityName}",
             () =>
             {
                 scope.DeleteById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value));
@@ -82,7 +90,7 @@ where TEntity : class, new()
             })
         from reloaded in Checkr.Capture(
             () => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
-        from canDelete in Checkr.Expect($"{entityName} Can Delete", () => reloaded is null)
+        from canDelete in Checkr.Expect($"Can Delete {entityName}", () => reloaded is null)
         from stored in info.Remove()
         select Case.Closed;
 

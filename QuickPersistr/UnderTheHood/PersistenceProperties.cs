@@ -5,14 +5,19 @@ using QuickPersistr.UnderTheHood.Many;
 
 namespace QuickPersistr.UnderTheHood;
 
+public record PropertyCheck<TEntity>(string Name, Func<TEntity, object?> GetValue)
+{
+    public Func<TEntity, TEntity, bool> Check = (a, b) => Equals(GetValue(a), GetValue(b));
+}
+
 public class PersistenceProperties<TReader, TEntity, TId>(PropertyInfo primaryKeyPropertyInfo)
 where TEntity : class, new()
 {
-    private readonly List<Func<TEntity, TEntity, bool>> propertyChecks = [];
+    private readonly List<PropertyCheck<TEntity>> propertyChecks = [];
     public PersistenceProperties<TReader, TEntity, TId> Property<TProp>(Expression<Func<TEntity, TProp>> propertyExpression)
     {
         var propertyInfo = propertyExpression.AsPropertyInfo();
-        propertyChecks.Add((a, b) => Equals(propertyInfo.GetValue(a), propertyInfo.GetValue(b)));
+        propertyChecks.Add(new(propertyInfo.Name, propertyInfo.GetValue));
         return this;
     }
 

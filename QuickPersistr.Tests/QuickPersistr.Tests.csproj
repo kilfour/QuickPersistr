@@ -25,6 +25,14 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- <ItemGroup>
+    <PackageReference Include="QuickCheckr.Authoring" Version="0.2.1" />
+  </ItemGroup> -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\QuickCheckr.Authoring\QuickCheckr.Authoring\QuickCheckr.Authoring.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\QuickPersistr\QuickPersistr.csproj" />
   </ItemGroup>

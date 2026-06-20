@@ -1,4 +1,8 @@
 using QuickCheckr;
+using QuickCheckr.Diagnostics;
+using QuickCheckr.Protocol;
+using QuickCheckr.Protocol.Custodians;
+using QuickCheckr.UnderTheHood;
 using QuickCheckr.UnderTheHood.Proceedings.ClerksOffice;
 
 namespace QuickPersistr;
@@ -29,17 +33,42 @@ public class PersisterRunner<TReader>(
     Func<IPersistenceScope<TReader>> scopeFactory,
     IPersistence<TReader>[] entities)
 {
-    public void Run()
+    private Func<CheckrConfig, CheckrConfig> configure = a => a;
+    public PersisterRunner<TReader> StoreCaseFiles(ICustodian? custodian = null)
+    {
+        configure = a => a with { FileAs = name, Custodian = custodian ?? Custodian.Default };
+        return this;
+    }
+
+    public ConfiguredCheckr Run()
     {
         var specifications = entities.Select(a => a.Define()).ToList();
         var count = specifications.Sum(a => a.CheckrCount);
 
-        GetCheckr(specifications)
-            .Configure(a => a with { FileAs = name, Clerk = CourtClerk.Default().WithStackTrace() })
+        return GetCheckr(specifications)
+            .Configure(a => configure(a with
+            {
+                Clerk = CourtClerk.Default().WithStackTrace(),
+                WarningLevel = WarningLevel.None
+            }))
             .Run(1.Runs(), count.ExecutionsPerRun());
     }
 
-    public CheckrOf<Case> GetCheckr(List<IPersistenceSpecification<TReader>> specifications)
+    // public ConfiguredCheckr Autopsy(int seed, AutopsyProbe probe)
+    // {
+    //     var specifications = entities.Select(a => a.Define()).ToList();
+    //     var count = specifications.Sum(a => a.CheckrCount);
+
+    //     return GetCheckr(specifications)
+    //         .Configure(a => configure(a with
+    //         {
+    //             Clerk = CourtClerk.Default().WithStackTrace(),
+    //             WarningLevel = WarningLevel.None
+    //         }))
+    //         .Autopsy(seed, count.ExecutionsPerRun(), probe);
+    // }
+
+    private CheckrOf<Case> GetCheckr(List<IPersistenceSpecification<TReader>> specifications)
     {
         return from scope in Trackr.Stashed(scopeFactory)
                from _ in Checkr.Sequence([.. specifications.SelectMany(a => a.ToCheckrs(scope))])
