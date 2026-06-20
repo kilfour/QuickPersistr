@@ -1,5 +1,3 @@
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using QuickPersistr.Tests.BackToSchool.Model;
 
 namespace QuickPersistr.Tests.BackToSchool;

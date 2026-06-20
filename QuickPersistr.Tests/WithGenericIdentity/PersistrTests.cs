@@ -13,9 +13,7 @@ public class GenericIdentityDbContext(DbContextOptions<GenericIdentityDbContext>
 
         modelBuilder.Entity<Thingamajig>(builder =>
         {
-            // Primary key.
             builder.HasKey(x => x.Id);
-            // Convert custom Id to Guid and back
             builder.Property(x => x.Id).HasConversion(id => id.Value, value => new Id<Thingamajig>(value));
         });
     }
