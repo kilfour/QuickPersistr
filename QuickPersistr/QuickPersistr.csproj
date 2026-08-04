@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- <ItemGroup>
-    <PackageReference Include="QuickCheckr" Version="0.2.1" />
-  </ItemGroup> -->
+  <ItemGroup>
+    <!-- <PackageReference Include="QuickCheckr" Version="0.2.2" /> -->
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\QuickCheckr\QuickCheckr\QuickCheckr.csproj" />

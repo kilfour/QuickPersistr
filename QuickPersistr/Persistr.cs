@@ -4,6 +4,8 @@ using QuickCheckr.Protocol;
 using QuickCheckr.Protocol.Custodians;
 using QuickCheckr.UnderTheHood;
 using QuickCheckr.UnderTheHood.Proceedings.ClerksOffice;
+using QuickFuzzr;
+using QuickFuzzr.UnderTheHood;
 
 namespace QuickPersistr;
 
@@ -14,22 +16,31 @@ public static class Persistr
 
 public class PersistrBuilderScope(string name)
 {
+    private FuzzrOf<Intent> domainConfig = Result.Unit;
+
+    public PersistrBuilderScope DomainConfiguration(FuzzrOf<Intent> domainConfig)
+    {
+        this.domainConfig = domainConfig;
+        return this;
+    }
     public PersisterBuilderEntities<TReader> Scope<TReader>(Func<IPersistenceScope<TReader>> scopeFactory)
-        => new(name, scopeFactory);
+        => new(name, domainConfig, scopeFactory);
 }
 
 
 public class PersisterBuilderEntities<TReader>(
     string name,
+    FuzzrOf<Intent> domainConfig,
     Func<IPersistenceScope<TReader>> scopeFactory)
 {
     public PersisterRunner<TReader> Entities(params IPersistence<TReader>[] entities)
-        => new(name, scopeFactory, entities);
+        => new(name, domainConfig, scopeFactory, entities);
 }
 
 
 public class PersisterRunner<TReader>(
     string name,
+    FuzzrOf<Intent> domainConfig,
     Func<IPersistenceScope<TReader>> scopeFactory,
     IPersistence<TReader>[] entities)
 {
@@ -48,6 +59,7 @@ public class PersisterRunner<TReader>(
         return GetCheckr(specifications)
             .Configure(a => configure(a with
             {
+                FileAs = name,
                 Clerk = CourtClerk.Default().WithStackTrace(),
                 WarningLevel = WarningLevel.None
             }))
@@ -68,10 +80,9 @@ public class PersisterRunner<TReader>(
     //         .Autopsy(seed, count.ExecutionsPerRun(), probe);
     // }
 
-    private CheckrOf<Case> GetCheckr(List<IPersistenceSpecification<TReader>> specifications)
-    {
-        return from scope in Trackr.Stashed(scopeFactory)
-               from _ in Checkr.Sequence([.. specifications.SelectMany(a => a.ToCheckrs(scope))])
-               select Case.Closed;
-    }
+    private CheckrOf<Case> GetCheckr(List<IPersistenceSpecification<TReader>> specifications) =>
+        from scope in Trackr.Stashed(scopeFactory)
+        from cfg in Trackr.Configr(domainConfig)
+        from seq in Checkr.Sequence([.. specifications.SelectMany(a => a.ToCheckrs(scope))])
+        select Case.Closed;
 }

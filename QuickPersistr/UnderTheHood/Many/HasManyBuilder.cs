@@ -5,10 +5,10 @@ using QuickFuzzr;
 namespace QuickPersistr.UnderTheHood.Many;
 
 public class HasManyFrom<TEntity, TReader, TId>(PropertyInfo primaryKeyPropertyInfo)
-where TEntity : class, new()
+where TEntity : class
 {
     public HasManyAddOne<TEntity, TReader, TChild, TId> From<TChild>(Persistence<TReader, TChild> childPersistence)
-    where TChild : class, new()
+    where TChild : class
     => new(primaryKeyPropertyInfo, childPersistence.Define().GetCreator<TChild>());
 }
 
@@ -16,8 +16,8 @@ public class HasManyAddOne<TEntity, TReader, TChild, TId>(
     PropertyInfo primaryKeyPropertyInfo,
     FuzzrOf<TChild> childFuzzr
 )
-where TChild : class, new()
-where TEntity : class, new()
+where TChild : class
+where TEntity : class
 {
     public HasManyAdded<TEntity, TReader, TChild, TId> AddOne(Action<TEntity, TChild> apply)
         => new(primaryKeyPropertyInfo, childFuzzr, apply);
@@ -28,8 +28,8 @@ public class HasManyAdded<TEntity, TReader, TChild, TId>(
     FuzzrOf<TChild> childFuzzr,
     Action<TEntity, TChild> apply
 )
-where TChild : class, new()
-where TEntity : class, new()
+where TChild : class
+where TEntity : class
 {
     public HasManyReload<TEntity, TReader, TChild, TId> Added(Func<TEntity, TChild, bool> check)
         => new(primaryKeyPropertyInfo, childFuzzr, apply, check);
@@ -41,8 +41,8 @@ public class HasManyReload<TEntity, TReader, TChild, TId>(
     Action<TEntity, TChild> apply,
     Func<TEntity, TChild, bool> check
 )
-where TChild : class, new()
-where TEntity : class, new()
+where TChild : class
+where TEntity : class
 {
     public HasManyClear<TEntity, TReader, TChild, TId> Reload(Func<IPersistenceReader<TReader>, TId, TEntity> reload)
         => new(primaryKeyPropertyInfo, childFuzzr, apply, check, reload);
@@ -55,8 +55,8 @@ public class HasManyClear<TEntity, TReader, TChild, TId>(
     Func<TEntity, TChild, bool> check,
     Func<IPersistenceReader<TReader>, TId, TEntity> reload
 )
-where TChild : class, new()
-where TEntity : class, new()
+where TChild : class
+where TEntity : class
 {
     public HasManyCleared<TEntity, TReader, TChild, TId> Clear(Action<TEntity> clear)
         => new(primaryKeyPropertyInfo, childFuzzr, apply, check, reload, clear);
@@ -70,8 +70,8 @@ public class HasManyCleared<TEntity, TReader, TChild, TId>(
     Func<IPersistenceReader<TReader>, TId, TEntity> reload,
     Action<TEntity> clear
 )
-where TChild : class, new()
-where TEntity : class, new()
+where TChild : class
+where TEntity : class
 {
     public Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>> Cleared(Func<TEntity, bool> checkCleared)
     {

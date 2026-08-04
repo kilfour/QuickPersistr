@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="QuickCheckr.Authoring" Version="0.2.1" />
     <PackageReference Include="QuickPulse.Explains" Version="0.3.17" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
@@ -25,13 +24,13 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <!-- <ItemGroup>
-    <PackageReference Include="QuickCheckr.Authoring" Version="0.2.1" />
-  </ItemGroup> -->
-
   <ItemGroup>
-    <ProjectReference Include="..\..\QuickCheckr.Authoring\QuickCheckr.Authoring\QuickCheckr.Authoring.csproj" />
+    <PackageReference Include="QuickCheckr.Authoring" Version="0.2.2" />
   </ItemGroup>
+
+  <!-- <ItemGroup>
+    <ProjectReference Include="..\..\QuickCheckr.Authoring\QuickCheckr.Authoring\QuickCheckr.Authoring.csproj" />
+  </ItemGroup> -->
 
   <ItemGroup>
     <ProjectReference Include="..\QuickPersistr\QuickPersistr.csproj" />

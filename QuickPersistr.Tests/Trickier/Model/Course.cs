@@ -1,5 +1,3 @@
-using TCMS.Domain.ValueObjects.CourseValueObjects;
-
 namespace QuickPersistr.Tests.Trickier.Model;
 
 public class Course : DomainEntity<Course>
@@ -11,7 +9,9 @@ public class Course : DomainEntity<Course>
     public List<CourseDay> Days { get; private set; }
     public bool IsDeleted { get; private set; } // SOFT DELETE
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private Course() { } // Voor EF Core ?? BOX
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     public Course(CourseName name, DateRange dateRange, TimeRange timeRange, List<CourseDay> days)
     {

@@ -1,6 +1,4 @@
-using QuickPersistr.Tests.Trickier.Model;
-
-namespace TCMS.Domain.ValueObjects.CourseValueObjects;
+namespace QuickPersistr.Tests.Trickier.Model;
 
 public record TimeRange
 {

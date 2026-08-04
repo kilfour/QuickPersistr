@@ -8,7 +8,7 @@ public interface IPersistence<TReader>
 }
 
 public abstract class Persistence<TReader, TEntity> : IPersistence<TReader>
-where TEntity : class, new()
+where TEntity : class
 {
     public abstract IPersistenceSpecification<TReader> Define();
     protected PersistencePrimaryKey<TReader, TEntity> Entity => new();

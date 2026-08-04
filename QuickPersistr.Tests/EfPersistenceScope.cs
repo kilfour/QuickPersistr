@@ -29,7 +29,7 @@ where TDbContext : DbContext
     public IPersistenceReader<TDbContext> Reader => new EfReader<TDbContext>(context);
 
     public TEntity GetById<TEntity>(object? id)
-    where TEntity : class, new()
+    where TEntity : class
         => context.Find<TEntity>(id)!;
 
     public TEntity Add<TEntity>(TEntity entity)

@@ -11,14 +11,14 @@ public class PersistenceSpecification<TReader, TEntity>(
     List<PropertyCheck<TEntity>> propertyChecks,
     List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies)
 : IPersistenceSpecification<TReader>
-where TEntity : class, new()
+where TEntity : class
 {
     private readonly string entityName = typeof(TEntity).Name;
 
     public int CheckrCount => 4 + oneToManies.Count;
 
     public FuzzrOf<T> GetCreator<T>()
-    where T : class, new()
+    where T : class
         => Creator.Select(a => (a as T)!);
 
     public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope<TReader> scope) =>
@@ -100,7 +100,7 @@ where TEntity : class, new()
         Func<T, TChild, bool> check,
         FuzzrOf<TChild> childFuzzr,
         IPersistenceScope scope)
-    where T : class, new() =>
+    where T : class =>
         from entity in Checkr.Capture(() => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
         from children in Checkr.Input("Children", childFuzzr.Many(1, 3))
         from updated in Checkr.Act("Add Many", () =>

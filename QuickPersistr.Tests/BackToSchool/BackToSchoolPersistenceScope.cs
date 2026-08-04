@@ -9,6 +9,4 @@ public class BackToSchoolPersistenceScope : EfPersistenceScope<BackToSchoolDbCon
 
 public abstract class BackToSchoolPersistence<TEntity>
     : Persistence<BackToSchoolDbContext, TEntity>
-    where TEntity : class, new()
-{
-}
+    where TEntity : class;
