@@ -2,7 +2,6 @@ using System.Reflection;
 using QuickCheckr;
 using QuickCheckr.UnderTheHood;
 using QuickFuzzr;
-using QuickPulse.Show;
 
 namespace QuickPersistr.UnderTheHood;
 
@@ -60,9 +59,9 @@ where TEntity : class
         from canRead in Combine.Checkrs(
             propertyChecks.Select(a =>
                 Checkr.Expect($"Can Read {entityName}.{a.Name}", () => a.Check(info.Value, entity),
-                () => [
-                        $"Expected: {a.GetValue(info.Value)}",
-                        $"Actual:   {a.GetValue(entity)}"])))
+                report => [
+                        $"Expected: {report.IntroduceThis(a.GetValue(info.Value))}",
+                        $"Actual:   {report.IntroduceThis(a.GetValue(entity))}"])))
         select Case.Closed;
 
     private CheckrOf<Case> UpdateCheckr(IPersistenceScope scope, PoolElement<TEntity> info) =>
@@ -75,9 +74,9 @@ where TEntity : class
             propertyChecks.Select(a =>
                 Checkr.Expect($"Can Update {entityName}.{a.Name}",
                     () => a.Check(updatedEntity, reloaded),
-                    () => [
-                        $"Expected: {a.GetValue(updatedEntity)}",
-                        $"Actual:   {a.GetValue(reloaded)}"])))
+                    report => [
+                        $"Expected: {report.IntroduceThis(a.GetValue(updatedEntity))}",
+                        $"Actual:   {report.IntroduceThis(a.GetValue(reloaded))}"])))
         from stored in info.Replace(reloaded)
         select Case.Closed;
 

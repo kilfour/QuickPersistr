@@ -1,0 +1,20 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                PersistrTests.cs:62:1
+ Original failing run:    2 executions
+ Seed:                    1300772408
+ ------------------------------------------------------------
+  Executed: Create Payment
+   - Entity = Payment-1
+   - Entity = { Id: 1, Status: Refunded }
+ ------------------------------------------------------------
+  Executed: Read Payment
+   - Entity = Payment-1
+ ==================================================
+  !! Expectation Failed: Can Read Payment.Status
+       Expected: Refunded
+       Actual:   Paid
+ ==================================================
+ Passed Expectations
+ - Can Create Payment: 1x
+ ------------------------------------------------------------

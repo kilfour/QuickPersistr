@@ -1,0 +1,22 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                PersistrTests.cs:68:1
+ Original failing run:    2 executions
+ Minimal failing case:    2 executions (after 3 shrinks)
+ Seed:                    907638377
+ ------------------------------------------------------------
+  Executed: Create LedgerEntry
+   - Entity = LedgerEntry-1
+   - Entity = { Amount: -99.89 }
+     Redux    { Amount: -0.01 }
+ ------------------------------------------------------------
+  Executed: Read LedgerEntry
+   - Entity = LedgerEntry-1
+ ======================================================
+  !! Expectation Failed: Can Read LedgerEntry.Amount
+       Expected: -99.89
+       Actual:   99.89
+ ======================================================
+ Passed Expectations
+ - Can Create LedgerEntry: 1x
+ ------------------------------------------------------------

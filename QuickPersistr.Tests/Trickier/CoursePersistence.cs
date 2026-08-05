@@ -10,7 +10,7 @@ public class CoursePersistence : TrickierPersistence<Course>
             .Property(a => a.Name)
             .Property(a => a.TimeRange)
             .Property(a => a.DateRange)
-            //.Property(a => a.Days)
+            .Property(a => a.Days, (expected, actual) => expected.SequenceEqual(actual))
             .Property(a => a.IsDeleted)
             .Persist();
 }

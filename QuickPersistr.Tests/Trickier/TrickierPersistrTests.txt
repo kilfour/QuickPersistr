@@ -1,0 +1,17 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Course: 1x
+ - Can Read Course.Name: 1x
+ - Can Read Course.TimeRange: 1x
+ - Can Read Course.DateRange: 1x
+ - Can Read Course.Days: 1x
+ - Can Read Course.IsDeleted: 1x
+ - Can Update Course.Name: 1x
+ - Can Update Course.TimeRange: 1x
+ - Can Update Course.DateRange: 1x
+ - Can Update Course.Days: 1x
+ - Can Update Course.IsDeleted: 1x
+ - Can Delete Course: 1x
+ ------------------------------------------------------------

@@ -1,0 +1,21 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                PersistrTests.cs:56:1
+ Original failing run:    2 executions
+ Minimal failing case:    2 executions (after 1 shrink)
+ Seed:                    633442700
+ ------------------------------------------------------------
+  Executed: Create AuditEntry
+   - Entity = AuditEntry-1
+   - Entity = { OccurredAt: 18.June(2026).At(26.To(13).Seconds(56, 789)) }
+ ------------------------------------------------------------
+  Executed: Read AuditEntry
+   - Entity = AuditEntry-1
+ =========================================================
+  !! Expectation Failed: Can Read AuditEntry.OccurredAt
+       Expected: 18.June(2026).At(26.To(13).Seconds(56, 789))
+       Actual:   18.June(2026).At(26.To(13).Seconds(56))
+ =========================================================
+ Passed Expectations
+ - Can Create AuditEntry: 1x
+ ------------------------------------------------------------

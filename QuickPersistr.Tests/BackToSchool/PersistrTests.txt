@@ -1,0 +1,17 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Course: 1x
+ - Can Read Course.Title: 1x
+ - Can Read Course.Description: 1x
+ - Can Update Course.Title: 1x
+ - Can Update Course.Description: 1x
+ - Course Can Add Student: 1x
+ - Course Can Clear Student: 1x
+ - Can Delete Course: 1x
+ - Can Create Student: 1x
+ - Can Read Student.Name: 1x
+ - Can Update Student.Name: 1x
+ - Can Delete Student: 1x
+ ------------------------------------------------------------

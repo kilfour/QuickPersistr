@@ -1,5 +1,4 @@
 using QuickCheckr;
-using QuickCheckr.Diagnostics;
 using QuickCheckr.Protocol;
 using QuickCheckr.Protocol.Custodians;
 using QuickCheckr.UnderTheHood;
@@ -53,17 +52,37 @@ public class PersisterRunner<TReader>(
 
     public ConfiguredCheckr Run()
     {
+        var cfgCheck = GetConfiguredCheckr();
+        return cfgCheck.Checkr.Run(1.Runs(), cfgCheck.ExecutionCount);
+    }
+
+    public ConfiguredCheckr Run(RunCount runs)
+    {
+        var cfgCheck = GetConfiguredCheckr();
+        return cfgCheck.Checkr.Run(runs, cfgCheck.ExecutionCount);
+    }
+
+    public ConfiguredCheckr Run(int seed)
+    {
+        var cfgCheck = GetConfiguredCheckr();
+        return cfgCheck.Checkr.Run(seed, cfgCheck.ExecutionCount);
+    }
+
+    private (ConfiguredCheckr Checkr, ExecutionCount ExecutionCount) GetConfiguredCheckr()
+    {
         var specifications = entities.Select(a => a.Define()).ToList();
         var count = specifications.Sum(a => a.CheckrCount);
 
-        return GetCheckr(specifications)
-            .Configure(a => configure(a with
-            {
-                FileAs = name,
-                Clerk = CourtClerk.Default().WithStackTrace(),
-                WarningLevel = WarningLevel.None
-            }))
-            .Run(1.Runs(), count.ExecutionsPerRun());
+        return (
+            GetCheckr(specifications)
+                .Configure(a => configure(a with
+                {
+                    FileAs = name,
+                    Clerk = CourtClerk.Default().WithStackTrace(),
+                    WarningLevel = WarningLevel.None,
+                    ShrinkMode = a.ShrinkMode | ShrinkMode.Reduction
+                })),
+            count.ExecutionsPerRun());
     }
 
     // public ConfiguredCheckr Autopsy(int seed, AutopsyProbe probe)

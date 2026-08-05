@@ -10,9 +10,21 @@ where TEntity : class
 {
     private readonly List<PropertyCheck<TEntity>> propertyChecks = [];
     public PersistenceProperties<TReader, TEntity, TId> Property<TProp>(Expression<Func<TEntity, TProp>> propertyExpression)
+        => Property(propertyExpression, EqualityComparer<TProp>.Default.Equals);
+
+    public PersistenceProperties<TReader, TEntity, TId> Property<TProp>(
+        Expression<Func<TEntity, TProp>> propertyExpression,
+        Func<TProp, TProp, bool> equals)
     {
+        ArgumentNullException.ThrowIfNull(propertyExpression);
+        ArgumentNullException.ThrowIfNull(equals);
+
         var propertyInfo = propertyExpression.AsPropertyInfo();
-        propertyChecks.Add(new(propertyInfo.Name, propertyInfo.GetValue));
+        var getValue = propertyExpression.Compile();
+        propertyChecks.Add(new(
+            propertyInfo.Name,
+            entity => getValue(entity),
+            (expected, actual) => equals(getValue(expected), getValue(actual))));
         return this;
     }
 

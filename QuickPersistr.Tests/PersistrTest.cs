@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using QuickCheckr.Authoring;
 using QuickCheckr.Authoring.ThePress;
@@ -14,29 +13,18 @@ public abstract class PersistrTest<T> : QuickCheckrTest<T>
     protected class DocPersistrHeaderAttribute() :
         DocBoldHeaderAttribute("The Persistr");
 
-    protected Journalist TheJournalist = new();
+    public abstract void Example();
+    protected abstract void Verify(Article article);
 
-    [StackTraceHidden]
-    protected void Document(
-        Action run,
-        Action<Article> verifier,
-        [CallerFilePath] string callerPath = "")
+    protected abstract void GetPersistr(Journalist journalist);
+
+    protected void Document([CallerFilePath] string callerPath = "")
     {
-        try { run(); } catch (FalsifiableException) { }
-        var article = TheJournalist.GetArticle();
+        var journalist = new Journalist();
+        try { GetPersistr(journalist); }
+        catch (FalsifiableException) { }
+        var article = journalist.GetArticle();
         ProcessArticle(article, callerPath);
-        verifier(article);
+        Verify(article);
     }
-
-    // [StackTraceHidden]
-    // protected void Document(
-    //     ConfiguredCheckr checkr,
-    //     Action<ConfiguredCheckr> runCheckr,
-    //     Action<Article> verifier,
-    //     [CallerFilePath] string callerPath = "")
-    // {
-    //     var article = Journalist.Publish(checkr, runCheckr);
-    //     ProcessArticle(article, callerPath);
-    //     verifier(article);
-    // }
 }
