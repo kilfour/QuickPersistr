@@ -2,7 +2,7 @@
  Test:                    Example
  Location:                IncorrectEnumConversionTests.cs:62:1
  Original failing run:    2 executions
- Seed:                    113076540
+ Seed:                    1206948999
  ------------------------------------------------------------
   Executed: Create Payment
    - Entity = Payment-1

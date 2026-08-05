@@ -2,18 +2,18 @@
  Test:                    Example
  Location:                IncorrectOwnedCollectionValueConversionTests.cs:62:1
  Original failing run:    2 executions
- Seed:                    1067746694
+ Seed:                    1399221127
  ------------------------------------------------------------
   Executed: Create Course
    - Entity = Course-1
-   - Entity = { Name: { Value: "stbfnmzvrwgagnjhtfktobtgpqfwoiybjotefzzkvbyyijxffbqdgygqauqxgchjyfrrtfctgaxnduxfta" }, DateRange: { StartDate: 1.January(2026), EndDate: 20.January(2026) }, TimeRange: { StartTime: 9.Past(13).Seconds(2, 620), EndTime: 4.Past(20).Seconds(34, 582) }, Days: [ { Day: Monday, Mode: OnCampus }, { Day: Thursday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: cc7a01cc-3da7-44f0-904a-7d7a58c3ce8c } }
+   - Entity = { Name: { Value: "polvngyysxiyqujtdegbhbaohnjcgxyvbvftmknrwpxrwhncotdvxyioownzxvs" }, DateRange: { StartDate: 1.January(2026), EndDate: 25.January(2026) }, TimeRange: { StartTime: 4.Past(Mid.Day).Seconds(59, 96), EndTime: 13.Past(14).Seconds(52, 930) }, Days: [ { Day: Thursday, Mode: OnCampus }, { Day: Thursday, Mode: RemoteLearning }, { Day: Wednesday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: 63ec1457-e9bf-47c2-bbc7-b3e198d2c890 } }
  ------------------------------------------------------------
   Executed: Read Course
    - Entity = Course-1
  ===============================================
   !! Expectation Failed: Can Read Course.Days
-       Expected: [ { Day: Monday, Mode: OnCampus }, { Day: Thursday, Mode: RemoteLearning } ]
-       Actual:   [ { Day: Monday, Mode: OnCampus }, { Day: Thursday, Mode: OnCampus } ]
+       Expected: [ { Day: Thursday, Mode: OnCampus }, { Day: Thursday, Mode: RemoteLearning }, { Day: Wednesday, Mode: RemoteLearning } ]
+       Actual:   [ { Day: Thursday, Mode: OnCampus }, { Day: Thursday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus } ]
  ===============================================
  Passed Expectations
  - Can Create Course: 1x
