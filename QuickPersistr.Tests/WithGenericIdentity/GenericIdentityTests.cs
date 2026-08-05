@@ -29,7 +29,7 @@ public class GenericIdentityTests : PersistrTest<GenericIdentityTests>
     {
         Assert.Equal("", article.FailureDescription());
         Assert.Equal("", article.VerifyFailed());
-        Assert.Equal(5, article.Total().PassedExpectations());
+        Assert.Equal(7, article.Total().PassedExpectations());
         Assert.Equal("Can Create Thingamajig", article.PassedExpectation(1).Read().Label);
         Assert.Equal(1, article.PassedExpectation(1).Read().TimesPassed);
         Assert.Equal("Can Read Thingamajig.Id", article.PassedExpectation(2).Read().Label);
@@ -40,5 +40,9 @@ public class GenericIdentityTests : PersistrTest<GenericIdentityTests>
         Assert.Equal(1, article.PassedExpectation(4).Read().TimesPassed);
         Assert.Equal("Can Delete Thingamajig", article.PassedExpectation(5).Read().Label);
         Assert.Equal(1, article.PassedExpectation(5).Read().TimesPassed);
+        Assert.Equal("Can Create Several Thingamajig", article.PassedExpectation(6).Read().Label);
+        Assert.Equal(1, article.PassedExpectation(6).Read().TimesPassed);
+        Assert.Equal("Can Create Unique Thingamajig.Id", article.PassedExpectation(7).Read().Label);
+        Assert.Equal(1, article.PassedExpectation(7).Read().TimesPassed);
     }
 }

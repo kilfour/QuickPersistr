@@ -15,14 +15,14 @@ where TEntity : class
 {
     private readonly string entityName = typeof(TEntity).Name;
 
-    public int CheckrCount => 4 + oneToManies.Count;
+    public int CheckrCount => 5 + oneToManies.Count;
 
     public FuzzrOf<T> GetCreator<T>()
     where T : class
         => Creator.Select(a => (a as T)!);
 
     public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope<TReader> scope) =>
-        [.. CruCheckrs(scope), .. OneToManyCheckrs(scope), .. DeleteCheckr(scope)];
+        [.. CruCheckrs(scope), .. OneToManyCheckrs(scope), .. DeleteCheckr(scope), CreateSeveralCheckr(scope)];
 
     private IList<CheckrOf<Case>> CruCheckrs(IPersistenceScope scope) => [
         CreateCheckr(scope),
@@ -54,7 +54,12 @@ where TEntity : class
             scope.Add(entity);
             CommitAndStartNewSession(scope);
         })
-        from canCreate in Checkr.Expect($"Can Create {entityName}", () => primaryKeyPropertyInfo.GetValue(entity) != default)
+        from canCreate in Checkr.Expect(
+            $"Can Create {entityName}",
+            () => IsNonDefaultPrimaryKey(primaryKeyPropertyInfo.GetValue(entity)),
+            report => [
+                $"Expected: Non-default {entityName}.{primaryKeyPropertyInfo.Name}",
+                $"Actual:   {report.IntroduceThis(primaryKeyPropertyInfo.GetValue(entity))}"])
         from stored in Trackr.ToPool("Entity", () => entity)
         select Case.Closed;
 
@@ -111,6 +116,33 @@ where TEntity : class
         from stored in info.Remove()
         select Case.Closed;
 
+    private CheckrOf<Case> CreateSeveralCheckr(IPersistenceScope scope) =>
+        from entities in Checkr.Input("Entities", Creator.Many(2))
+        from create in Checkr.Act($"Create Several {entityName}", () =>
+        {
+            foreach (var entity in entities)
+            {
+                scope.Add(entity);
+            }
+            CommitAndStartNewSession(scope);
+        })
+        from identities in Checkr.Capture(() => entities
+            .Select(primaryKeyPropertyInfo.GetValue)
+            .ToList())
+        from nonDefault in Checkr.Expect(
+            $"Can Create Several {entityName}",
+            () => identities.Count == 2 && identities.All(IsNonDefaultPrimaryKey),
+            report => [
+                $"Expected: 2 non-default {entityName}.{primaryKeyPropertyInfo.Name} values",
+                $"Actual:   {report.IntroduceThis(identities)}"])
+        from unique in Checkr.Expect(
+            $"Can Create Unique {entityName}.{primaryKeyPropertyInfo.Name}",
+            () => identities.Distinct().Count() == identities.Count,
+            report => [
+                $"Expected: {identities.Count} distinct {entityName}.{primaryKeyPropertyInfo.Name} values",
+                $"Actual:   {report.IntroduceThis(identities)}"])
+        select Case.Closed;
+
     public CheckrOf<Case> GetHasManyCheckr<T, TChild>(
         PoolElement<T> info,
         Action<T, TChild> apply,
@@ -139,5 +171,13 @@ where TEntity : class
     {
         scope.Commit();
         scope.StartNewSession();
+    }
+
+    private bool IsNonDefaultPrimaryKey(object? value)
+    {
+        var defaultValue = primaryKeyPropertyInfo.PropertyType.IsValueType
+            ? Activator.CreateInstance(primaryKeyPropertyInfo.PropertyType)
+            : null;
+        return !Equals(value, defaultValue);
     }
 }

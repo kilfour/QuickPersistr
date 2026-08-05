@@ -1,0 +1,14 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                PersistrTests.cs:68:1
+ Original failing run:    1 execution
+ Seed:                    751926438
+ ------------------------------------------------------------
+  Executed: Create Thingamajig
+   - Entity = Thingamajig-1
+   - Entity = { Id: { Value: 0 } }
+ =================================================
+  !! Expectation Failed: Can Create Thingamajig
+       Expected: Non-default Thingamajig.Id
+       Actual:   { Value: 0 }
+ =================================================

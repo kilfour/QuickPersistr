@@ -2,7 +2,6 @@
 > Look out, honey, 'cause I'm using technology
 
 
-After that, I’d prioritise:
 Identity uniqueness
 Create several entities and verify every generated key is non-default and distinct. This catches constant/default generators and converter collisions.
 

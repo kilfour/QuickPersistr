@@ -1,0 +1,22 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                PersistrTests.cs:68:1
+ Original failing run:    5 executions
+ Minimal failing case:    1 execution (after 6 shrinks)
+ Seed:                    751926438
+ ------------------------------------------------------------
+  Executed: Create Several Thingamajig
+   - Entities = [ { Id: { Value: 42 } }, { Id: { Value: 42 } } ]
+ ===========================================================
+  !! Expectation Failed: Can Create Unique Thingamajig.Id
+       Expected: 2 distinct Thingamajig.Id values
+       Actual:   [ { Value: 42 }, { Value: 42 } ]
+ ===========================================================
+ Passed Expectations
+ - Can Create Thingamajig: 1x
+ - Can Read Thingamajig.Id: 1x
+ - Can Read Thingamajig.Description: 1x
+ - Can Update Thingamajig.Description: 1x
+ - Can Delete Thingamajig: 1x
+ - Can Create Several Thingamajig: 1x
+ ------------------------------------------------------------

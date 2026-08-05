@@ -29,7 +29,7 @@ public class TrickierPersistrTests : PersistrTest<TrickierPersistrTests>
     {
         Assert.Equal("", article.FailureDescription());
         Assert.Equal("", article.VerifyFailed());
-        Assert.Equal(13, article.Total().PassedExpectations());
+        Assert.Equal(15, article.Total().PassedExpectations());
         Assert.Equal("Can Create Course", article.PassedExpectation(1).Read().Label);
         Assert.Equal(1, article.PassedExpectation(1).Read().TimesPassed);
         Assert.Equal("Can Read Course.Id", article.PassedExpectation(2).Read().Label);
@@ -56,5 +56,9 @@ public class TrickierPersistrTests : PersistrTest<TrickierPersistrTests>
         Assert.Equal(1, article.PassedExpectation(12).Read().TimesPassed);
         Assert.Equal("Can Delete Course", article.PassedExpectation(13).Read().Label);
         Assert.Equal(1, article.PassedExpectation(13).Read().TimesPassed);
+        Assert.Equal("Can Create Several Course", article.PassedExpectation(14).Read().Label);
+        Assert.Equal(1, article.PassedExpectation(14).Read().TimesPassed);
+        Assert.Equal("Can Create Unique Course.Id", article.PassedExpectation(15).Read().Label);
+        Assert.Equal(1, article.PassedExpectation(15).Read().TimesPassed);
     }
 }
