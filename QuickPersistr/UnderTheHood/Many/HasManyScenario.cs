@@ -20,6 +20,11 @@ where TChild : class
         from stored in element.Replace(cleared)
         select Case.Closed;
 
+    public CheckrOf<Case> CheckAdditive(PoolElement<TEntity> element) =>
+        from added in AddChildren(element)
+        from stored in element.Replace(added.Source)
+        select Case.Closed;
+
     private CheckrOf<AddedRelationship> AddChildren(PoolElement<TEntity> element) =>
         from sourceId in Checkr.Capture(
             () => definition.Identity.Select(element.Value))

@@ -29,6 +29,25 @@ where TEntity : class
 {
     public HasManyClear<TEntity, TReader, TChild, TId> Remove(Action<TEntity, TChild> remove) =>
         new(definition with { Remove = remove });
+
+    public HasManyAdditiveContains<TEntity, TReader, TChild, TId> Reload(
+        Func<IPersistenceReader<TReader>, TId, TEntity> reload) =>
+        new(definition with { Reload = reload });
+}
+
+public class HasManyAdditiveContains<TEntity, TReader, TChild, TId>(
+    HasManyDefinition<TEntity, TReader, TChild, TId> definition)
+where TChild : class
+where TEntity : class
+{
+    public Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>> Contains(
+        Func<TEntity, TChild, bool> contains)
+    {
+        var completed = definition with { Contains = contains };
+        return (scope, element) =>
+            new HasManyScenario<TEntity, TReader, TChild, TId>(completed, scope)
+                .CheckAdditive(element);
+    }
 }
 
 public class HasManyClear<TEntity, TReader, TChild, TId>(
