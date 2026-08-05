@@ -4,10 +4,10 @@ using QuickCheckr.Authoring.ThePress.Printing;
 using QuickFuzzr;
 using QuickPulse.Explains;
 
-namespace QuickPersistr.Tests.IncorrectCascadeDelete;
+namespace QuickPersistr.Tests.OrphanedDependent;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class OrphanedDependentTests : PersistrTest<OrphanedDependentTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;
@@ -21,27 +21,25 @@ public class PersistrTests : PersistrTest<PersistrTests>
     [CodeRemove(".StoreCaseFiles(journalist)")]
     protected override void GetPersistr(Journalist journalist) =>
         Persistr
-            .Named("Incorrect cascade delete")
+            .Named("Orphaned dependent")
             .DomainConfiguration(
                 Configr<Blog>.Construct(
                     Fuzzr.One<Post>().Many(1, 3).ToList()))
-            .Scope(() => new IncorrectCascadeScope())
+            .Scope(() => new OrphaningScope())
             .Entities(new BlogPersistence())
             .StoreCaseFiles(journalist)
             .Run(751926438);
 
     protected override void Verify(Article article)
     {
-        Assert.Equal(
-            "DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.",
-            article.FailureDescription());
+        Assert.Equal("Deleting Blog removes Posts", article.FailureDescription());
         Assert.Empty(article.FailingExpectationMessages());
         Assert.Equal("", article.VerifyFailed());
         Assert.Equal(2, article.Total().Executions());
         Assert.Equal(2, article.Total().Actions());
-        Assert.Equal(0, article.Total().Inputs());
+        Assert.Equal(1, article.Total().Inputs());
         Assert.Equal(2, article.Total().PoolTraces());
-        Assert.Equal(4, article.Total().PassedExpectations());
+        Assert.Equal(5, article.Total().PassedExpectations());
         Assert.Equal(5, article.ShrinkCount);
         Assert.Equal(1, article.Execution(1).Read().ExecutionId);
         Assert.Equal("Create Blog", article.Execution(1).Action(1).Read().Label);
@@ -55,8 +53,9 @@ public class PersistrTests : PersistrTest<PersistrTests>
         Assert.Equal("Can Read Blog.Id", article.PassedExpectation(2).Read().Label);
         Assert.Equal("Can Read Blog.Name", article.PassedExpectation(3).Read().Label);
         Assert.Equal("Can Update Blog.Name", article.PassedExpectation(4).Read().Label);
+        Assert.Equal("Can Delete Blog", article.PassedExpectation(5).Read().Label);
         Assert.All(
-            Enumerable.Range(1, 4),
+            Enumerable.Range(1, 5),
             index => Assert.Equal(1, article.PassedExpectation(index).Read().TimesPassed));
     }
 }
@@ -77,19 +76,25 @@ public class Post
     public string Title { get; set; } = string.Empty;
 }
 
-public class BlogPersistence : Persistence<IncorrectCascadeDbContext, Blog>
+public class BlogPersistence : Persistence<OrphaningDbContext, Blog>
 {
-    public override IPersistenceSpecification<IncorrectCascadeDbContext> Define() =>
+    public override IPersistenceSpecification<OrphaningDbContext> Define() =>
         Entity
             .PrimaryKey(blog => blog.Id)
             .Property(blog => blog.Name)
+            .AfterDelete(
+                "removes Posts",
+                (reader, blog) => reader.Query(db =>
+                    !db.Set<Post>().Any(post => post.BlogId == blog.Id)))
             .Persist();
 }
 
-public class IncorrectCascadeScope()
-    : EfPersistenceScope<IncorrectCascadeDbContext>(options => new IncorrectCascadeDbContext(options));
+public class OrphaningScope()
+    : EfPersistenceScope<OrphaningDbContext>(
+        options => new OrphaningDbContext(options),
+        enforceForeignKeys: false);
 
-public class IncorrectCascadeDbContext(DbContextOptions<IncorrectCascadeDbContext> options)
+public class OrphaningDbContext(DbContextOptions<OrphaningDbContext> options)
     : DbContext(options)
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -98,7 +103,6 @@ public class IncorrectCascadeDbContext(DbContextOptions<IncorrectCascadeDbContex
             .HasMany(blog => blog.Posts)
             .WithOne()
             .HasForeignKey(post => post.BlogId)
-            // Bug: deleting a Blog leaves required Posts blocking the delete.
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

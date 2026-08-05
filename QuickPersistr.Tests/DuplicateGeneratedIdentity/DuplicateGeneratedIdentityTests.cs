@@ -5,7 +5,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.DuplicateGeneratedIdentity;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class DuplicateGeneratedIdentityTests : PersistrTest<DuplicateGeneratedIdentityTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

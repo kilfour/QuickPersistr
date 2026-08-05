@@ -7,7 +7,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.BackToSchool;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class BackToSchoolPersistenceTests : PersistrTest<BackToSchoolPersistenceTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

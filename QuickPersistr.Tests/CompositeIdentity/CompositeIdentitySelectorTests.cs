@@ -5,7 +5,7 @@ using QuickPulse.Explains;
 
 namespace QuickPersistr.Tests.CompositeIdentity;
 
-public class PersistrTests : PersistrTest<PersistrTests>
+public class CompositeIdentitySelectorTests : PersistrTest<CompositeIdentitySelectorTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

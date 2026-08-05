@@ -7,7 +7,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.IgnoredRelationshipReassignment;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class IgnoredRelationshipReassignmentTests : PersistrTest<IgnoredRelationshipReassignmentTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

@@ -8,7 +8,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.IncorrectEnumConversion;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class IncorrectEnumConversionTests : PersistrTest<IncorrectEnumConversionTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

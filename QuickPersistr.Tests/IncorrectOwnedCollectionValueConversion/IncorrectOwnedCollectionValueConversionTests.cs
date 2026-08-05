@@ -9,7 +9,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.IncorrectOwnedCollectionValueConversion;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class IncorrectOwnedCollectionValueConversionTests : PersistrTest<IncorrectOwnedCollectionValueConversionTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

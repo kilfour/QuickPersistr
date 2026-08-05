@@ -1,24 +1,21 @@
  ------------------------------------------------------------
  Test:                    Example
- Location:                PersistrTests.cs:68:1
+ Location:                IncorrectCascadeDeleteTests.cs:68:1
  Original failing run:    4 executions
  Minimal failing case:    2 executions (after 5 shrinks)
  Seed:                    751926438
  ------------------------------------------------------------
   Executed: Create Blog
    - Entity = Blog-1
-   - Entity = { Name: "raeowiiyls" }
-     Redux    { Name: "" }
  ------------------------------------------------------------
   Executed: Delete Blog
    - Entity = Blog-1
- ======================================================
-  !! Expectation Failed: Deleting Blog removes Posts
- ======================================================
+ ============================================================
+  !! DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ============================================================
  Passed Expectations
  - Can Create Blog: 1x
  - Can Read Blog.Id: 1x
  - Can Read Blog.Name: 1x
  - Can Update Blog.Name: 1x
- - Can Delete Blog: 1x
  ------------------------------------------------------------

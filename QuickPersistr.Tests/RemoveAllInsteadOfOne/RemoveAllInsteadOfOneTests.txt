@@ -1,24 +1,27 @@
  ------------------------------------------------------------
  Test:                    Example
- Location:                PersistrTests.cs:68:1
+ Location:                RemoveAllInsteadOfOneTests.cs:68:1
  Original failing run:    4 executions
- Minimal failing case:    2 executions (after 11 shrinks)
- Seed:                    164298753
+ Minimal failing case:    2 executions (after 13 shrinks)
+ Seed:                    751926438
  ------------------------------------------------------------
   Executed: Create Course
    - Entity = Course-1
-   - Entity = { Title: "uzxg", Description: "pfpui" }
+   - Entity = { Title: "uqbi", Description: "olvqyi" }
      Redux    { Title: "", Description: "" }
  ------------------------------------------------------------
   Executed: Add Children, Clear Children, Remove Child
    - Entity   = Course-1
-   - Children = [ _ ]
- =================================================
-  !! Expectation Failed: Course Can Add Student
- =================================================
+   - Children = [ _, _ ]
+ =======================================================
+  !! Expectation Failed: Course Retains Other Student
+       Expected: [ { Id: 2, Name: "gbg" } ]
+       Actual:   [ ]
+ =======================================================
  Passed Expectations
  - Can Create Course: 1x
  - Can Read Course.Id: 1x
+ - Course Can Add Student: 1x
  - Course Can Remove Student: 1x
  - Course Can Clear Student: 1x
  ------------------------------------------------------------

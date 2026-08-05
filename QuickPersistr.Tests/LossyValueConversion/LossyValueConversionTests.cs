@@ -7,7 +7,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.LossyValueConversion;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class LossyValueConversionTests : PersistrTest<LossyValueConversionTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

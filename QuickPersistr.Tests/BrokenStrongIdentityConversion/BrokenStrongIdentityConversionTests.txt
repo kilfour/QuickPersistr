@@ -1,6 +1,6 @@
  ------------------------------------------------------------
  Test:                    Example
- Location:                PersistrTests.cs:68:1
+ Location:                BrokenStrongIdentityConversionTests.cs:68:1
  Original failing run:    2 executions
  Minimal failing case:    2 executions (after 2 shrinks)
  Seed:                    1489207536

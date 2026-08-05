@@ -1,6 +1,6 @@
  ------------------------------------------------------------
  Test:                    Example
- Location:                PersistrTests.cs:56:1
+ Location:                LossyValueConversionTests.cs:56:1
  Original failing run:    2 executions
  Minimal failing case:    2 executions (after 1 shrink)
  Seed:                    575842212

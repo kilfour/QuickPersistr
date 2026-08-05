@@ -7,7 +7,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.OmittedChild;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class OmittedChildTests : PersistrTest<OmittedChildTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

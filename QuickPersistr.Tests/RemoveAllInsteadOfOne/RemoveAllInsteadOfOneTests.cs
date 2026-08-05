@@ -8,7 +8,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.RemoveAllInsteadOfOne;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class RemoveAllInsteadOfOneTests : PersistrTest<RemoveAllInsteadOfOneTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

@@ -7,7 +7,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.SignSensitiveValueConversion;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class SignSensitiveValueConversionTests : PersistrTest<SignSensitiveValueConversionTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;

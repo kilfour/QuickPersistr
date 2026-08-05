@@ -7,7 +7,7 @@ using QuickPulse.Explains;
 namespace QuickPersistr.Tests.BrokenStrongIdentityConversion;
 
 [DocFile]
-public class PersistrTests : PersistrTest<PersistrTests>
+public class BrokenStrongIdentityConversionTests : PersistrTest<BrokenStrongIdentityConversionTests>
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;
