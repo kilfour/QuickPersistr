@@ -35,7 +35,11 @@ public class PersistrTests : PersistrTest<PersistrTests>
     protected override void Verify(Article article)
     {
         Assert.Equal("Can Read Course.Days", article.FailureDescription());
-        Assert.Equal(2, article.FailingExpectationMessages().Count);
+        var messages = article.FailingExpectationMessages();
+        Assert.Equal(2, messages.Count);
+        Assert.Contains("RemoteLearning", messages[0]);
+        Assert.Contains("OnCampus", messages[1]);
+        Assert.DoesNotContain("RemoteLearning", messages[1]);
         Assert.Equal("", article.VerifyFailed());
         Assert.NotNull(article.Seed());
         Assert.Equal(2, article.Total().Executions());
