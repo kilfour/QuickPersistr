@@ -33,6 +33,33 @@ where TEntity : class
     private readonly List<RejectedOperation<TEntity>> rejectedCreates = [];
     private readonly List<RejectedOperation<TEntity>> rejectedUpdates = [];
     private readonly List<RejectedOperation<TEntity>> rejectedDeletes = [];
+    private readonly List<DomainMutation<TEntity>> domainUpdates = [];
+
+    public PersistenceProperties<TReader, TEntity, TId> Update(
+        Expression<Action<TEntity>> mutation)
+    {
+        ArgumentNullException.ThrowIfNull(mutation);
+
+        if (mutation.Body is not MethodCallExpression methodCall)
+        {
+            throw new ArgumentException(
+                "An inferred update must be a domain method call.",
+                nameof(mutation));
+        }
+
+        return Update(methodCall.Method.Name, mutation.Compile());
+    }
+
+    public PersistenceProperties<TReader, TEntity, TId> Update(
+        string description,
+        Action<TEntity> mutation)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        ArgumentNullException.ThrowIfNull(mutation);
+
+        domainUpdates.Add(new(description, mutation));
+        return this;
+    }
 
     public PersistenceProperties<TReader, TEntity, TId> CreateRejected<TException>(
         string description,
@@ -93,7 +120,8 @@ where TEntity : class
             afterDeleteChecks,
             rejectedCreates,
             rejectedUpdates,
-            rejectedDeletes);
+            rejectedDeletes,
+            domainUpdates);
 
     private PersistenceProperties<TReader, TEntity, TId> AddRejected<TException>(
         List<RejectedOperation<TEntity>> operations,

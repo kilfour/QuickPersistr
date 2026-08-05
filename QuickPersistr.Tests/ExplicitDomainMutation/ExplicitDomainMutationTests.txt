@@ -1,0 +1,14 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Publication: 1x
+ - Can Read Publication.Id: 1x
+ - Can Read Publication.Status: 1x
+ - Can Update Publication.Status: 1x
+ - ChangeStatus Preserves Publication.Id: 1x
+ - ChangeStatus Persists Publication.Status: 1x
+ - Can Delete Publication: 1x
+ - Can Create Several Publication: 1x
+ - Can Create Unique Publication.Id: 1x
+ ------------------------------------------------------------

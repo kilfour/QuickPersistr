@@ -1,0 +1,24 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                IgnoredDomainMutationTests.cs:56:1
+ Original failing run:    4 executions
+ Minimal failing case:    2 executions (after 4 shrinks)
+ Seed:                    18319096
+ ------------------------------------------------------------
+  Executed: Create Publication
+   - Entity = Publication-1
+ ------------------------------------------------------------
+  Executed: Update Publication: ChangeStatus
+   - Entity = Publication-1
+ ===================================================================
+  !! Expectation Failed: ChangeStatus Persists Publication.Status
+       Expected: Published
+       Actual:   Draft
+ ===================================================================
+ Passed Expectations
+ - Can Create Publication: 1x
+ - Can Read Publication.Id: 1x
+ - Can Read Publication.Status: 1x
+ - Can Update Publication.Status: 1x
+ - ChangeStatus Preserves Publication.Id: 1x
+ ------------------------------------------------------------

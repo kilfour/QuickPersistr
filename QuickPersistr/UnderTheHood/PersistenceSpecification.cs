@@ -11,7 +11,8 @@ public class PersistenceSpecification<TReader, TEntity, TId>(
     List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks,
     List<RejectedOperation<TEntity>> rejectedCreates,
     List<RejectedOperation<TEntity>> rejectedUpdates,
-    List<RejectedOperation<TEntity>> rejectedDeletes)
+    List<RejectedOperation<TEntity>> rejectedDeletes,
+    List<DomainMutation<TEntity>> domainUpdates)
 : IPersistenceSpecification<TReader>
 where TEntity : class
 {
@@ -23,7 +24,8 @@ where TEntity : class
         oneToManies.Count +
         rejectedCreates.Count +
         rejectedUpdates.Count +
-        rejectedDeletes.Count;
+        rejectedDeletes.Count +
+        domainUpdates.Count;
 
     public FuzzrOf<T> GetCreator<T>()
     where T : class
@@ -32,6 +34,7 @@ where TEntity : class
     public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope<TReader> scope) =>
         [
             .. CruCheckrs(scope),
+            .. DomainUpdateCheckrs(scope),
             .. OneToManyCheckrs(scope),
             .. RejectedCreateCheckrs(scope),
             .. RejectedUpdateCheckrs(scope),
@@ -52,6 +55,16 @@ where TEntity : class
 
     private IList<CheckrOf<Case>> DeleteCheckr(IPersistenceScope<TReader> scope) => [
         Trackr.OneOfPool<TEntity>("Entity", info => DeleteCheckr(scope, info))];
+
+    private IList<CheckrOf<Case>> DomainUpdateCheckrs(IPersistenceScope<TReader> scope)
+    {
+        var scenario = new DomainMutationScenario<TReader, TEntity, TId>(
+            identitySelector,
+            propertyChecks,
+            scope);
+        return [.. domainUpdates.Select(mutation =>
+            Trackr.OneOfPool<TEntity>("Entity", element => scenario.Check(mutation, element)))];
+    }
 
     private IList<CheckrOf<Case>> RejectedCreateCheckrs(IPersistenceScope<TReader> scope)
     {
