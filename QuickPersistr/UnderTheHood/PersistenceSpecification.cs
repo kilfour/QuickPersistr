@@ -56,6 +56,14 @@ where TEntity : class
     private CheckrOf<Case> ReadCheckr(PoolElement<TEntity> info, IPersistenceScope scope) =>
         from entity in Checkr.Act($"Read {entityName}", () =>
             scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
+        from canReadPrimaryKey in Checkr.Expect(
+            $"Can Read {entityName}.{primaryKeyPropertyInfo.Name}",
+            () => Equals(
+                primaryKeyPropertyInfo.GetValue(info.Value),
+                primaryKeyPropertyInfo.GetValue(entity)),
+            report => [
+                $"Expected: {report.IntroduceThis(primaryKeyPropertyInfo.GetValue(info.Value))}",
+                $"Actual:   {report.IntroduceThis(primaryKeyPropertyInfo.GetValue(entity))}"])
         from canRead in Combine.Checkrs(
             propertyChecks.Select(a =>
                 Checkr.Expect($"Can Read {entityName}.{a.Name}", () => a.Check(info.Value, entity),

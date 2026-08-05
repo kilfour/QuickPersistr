@@ -1,0 +1,22 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                PersistrTests.cs:68:1
+ Original failing run:    4 executions
+ Minimal failing case:    2 executions (after 11 shrinks)
+ Seed:                    164298753
+ ------------------------------------------------------------
+  Executed: Create Course
+   - Entity = Course-1
+   - Entity = { Title: "uzxg", Description: "pfpui" }
+     Redux    { Title: "", Description: "" }
+ ------------------------------------------------------------
+  Executed: Add Children, Clear Children
+   - Entity   = Course-1
+   - Children = [ _ ]
+ =================================================
+  !! Expectation Failed: Course Can Add Student
+ =================================================
+ Passed Expectations
+ - Can Create Course: 1x
+ - Course Can Clear Student: 1x
+ ------------------------------------------------------------

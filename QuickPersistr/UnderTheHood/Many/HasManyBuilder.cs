@@ -96,7 +96,7 @@ where TEntity : class
             from id in Checkr.Capture(() => (TId)primaryKeyPropertyInfo.GetValue(info.Value)!)
             from entity in Checkr.Capture(() => scope.GetById<TEntity>(id))
             from children in Checkr.Input("Children", childFuzzr.Many(1, 3))
-            from updated in Checkr.Act("Update", () =>
+            from updated in Checkr.Act("Add Children", () =>
             {
                 foreach (var child in children)
                 {
@@ -107,7 +107,7 @@ where TEntity : class
             from reloaded in Checkr.Capture(
                 () => reload(scope.Reader, id))
             from canUpdate in Checkr.Expect($"{entityName} Can Add {childEntityName}", () => children.All(a => check(reloaded, a)))
-            from clearMany in Checkr.Act("Clear Many", () => { clear(reloaded); scope.Commit(); })
+            from clearMany in Checkr.Act("Clear Children", () => { clear(reloaded); scope.Commit(); })
             from reloadedCleared in Checkr.Capture(
                 () => reload(scope.Reader, id))
             from cleared in Checkr.Expect($"{entityName} Can Clear {childEntityName}", () => checkCleared(reloadedCleared))

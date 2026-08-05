@@ -44,7 +44,7 @@ public class PersistrTests : PersistrTest<PersistrTests>
         Assert.Equal(2, article.Total().Actions());
         Assert.Equal(1, article.Total().Inputs());
         Assert.Equal(2, article.Total().PoolTraces());
-        Assert.Equal(1, article.Total().PassedExpectations());
+        Assert.Equal(2, article.Total().PassedExpectations());
         Assert.True(article.ShrinkCount is 0 or 1);
         Assert.Equal(1, article.Execution(1).Read().ExecutionId);
         Assert.Equal("Create Payment", article.Execution(1).Action(1).Read().Label);
@@ -58,6 +58,8 @@ public class PersistrTests : PersistrTest<PersistrTests>
         Assert.Equal("Payment-1", article.Execution(2).PoolTrace(1).Read().Value);
         Assert.Equal("Can Create Payment", article.PassedExpectation(1).Read().Label);
         Assert.Equal(1, article.PassedExpectation(1).Read().TimesPassed);
+        Assert.Equal("Can Read Payment.Id", article.PassedExpectation(2).Read().Label);
+        Assert.Equal(1, article.PassedExpectation(2).Read().TimesPassed);
     }
 }
 

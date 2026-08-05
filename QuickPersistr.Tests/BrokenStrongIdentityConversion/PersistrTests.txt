@@ -1,0 +1,9 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Thingamajig: 1x
+ - Can Read Thingamajig.Description: 1x
+ - Can Update Thingamajig.Description: 1x
+ - Can Delete Thingamajig: 1x
+ ------------------------------------------------------------

@@ -29,14 +29,16 @@ public class GenericIdentityTests : PersistrTest<GenericIdentityTests>
     {
         Assert.Equal("", article.FailureDescription());
         Assert.Equal("", article.VerifyFailed());
-        Assert.Equal(4, article.Total().PassedExpectations());
+        Assert.Equal(5, article.Total().PassedExpectations());
         Assert.Equal("Can Create Thingamajig", article.PassedExpectation(1).Read().Label);
         Assert.Equal(1, article.PassedExpectation(1).Read().TimesPassed);
-        Assert.Equal("Can Read Thingamajig.Description", article.PassedExpectation(2).Read().Label);
+        Assert.Equal("Can Read Thingamajig.Id", article.PassedExpectation(2).Read().Label);
         Assert.Equal(1, article.PassedExpectation(2).Read().TimesPassed);
-        Assert.Equal("Can Update Thingamajig.Description", article.PassedExpectation(3).Read().Label);
+        Assert.Equal("Can Read Thingamajig.Description", article.PassedExpectation(3).Read().Label);
         Assert.Equal(1, article.PassedExpectation(3).Read().TimesPassed);
-        Assert.Equal("Can Delete Thingamajig", article.PassedExpectation(4).Read().Label);
+        Assert.Equal("Can Update Thingamajig.Description", article.PassedExpectation(4).Read().Label);
         Assert.Equal(1, article.PassedExpectation(4).Read().TimesPassed);
+        Assert.Equal("Can Delete Thingamajig", article.PassedExpectation(5).Read().Label);
+        Assert.Equal(1, article.PassedExpectation(5).Read().TimesPassed);
     }
 }
