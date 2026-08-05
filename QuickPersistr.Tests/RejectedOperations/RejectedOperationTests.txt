@@ -1,0 +1,20 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Document: 1x
+ - Can Read Document.Id: 1x
+ - Can Read Document.Title: 1x
+ - Can Update Document.Title: 1x
+ - Rejects Creating Document: invalid document: 1x
+ - Rejected Create Leaves Document Absent: 1x
+ - Rejects Updating Document: invalid change: 1x
+ - Rejected Update Preserves Document.Id: 1x
+ - Rejected Update Preserves Document.Title: 1x
+ - Rejects Deleting Document: protected document: 1x
+ - Rejected Delete Preserves Document.Id: 1x
+ - Rejected Delete Preserves Document.Title: 1x
+ - Can Delete Document: 1x
+ - Can Create Several Document: 1x
+ - Can Create Unique Document.Id: 1x
+ ------------------------------------------------------------

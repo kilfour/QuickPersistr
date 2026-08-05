@@ -8,21 +8,37 @@ public class PersistenceSpecification<TReader, TEntity, TId>(
     IdentitySelector<TEntity, TId> identitySelector,
     List<PropertyCheck<TEntity>> propertyChecks,
     List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies,
-    List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks)
+    List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks,
+    List<RejectedOperation<TEntity>> rejectedCreates,
+    List<RejectedOperation<TEntity>> rejectedUpdates,
+    List<RejectedOperation<TEntity>> rejectedDeletes)
 : IPersistenceSpecification<TReader>
 where TEntity : class
 {
     private readonly string entityName = typeof(TEntity).Name;
     private readonly string identityName = identitySelector.QualifiedName(typeof(TEntity).Name);
 
-    public int CheckrCount => 5 + oneToManies.Count;
+    public int CheckrCount =>
+        5 +
+        oneToManies.Count +
+        rejectedCreates.Count +
+        rejectedUpdates.Count +
+        rejectedDeletes.Count;
 
     public FuzzrOf<T> GetCreator<T>()
     where T : class
         => Creator.Select(a => (a as T)!);
 
     public IList<CheckrOf<Case>> ToCheckrs(IPersistenceScope<TReader> scope) =>
-        [.. CruCheckrs(scope), .. OneToManyCheckrs(scope), .. DeleteCheckr(scope), CreateSeveralCheckr(scope)];
+        [
+            .. CruCheckrs(scope),
+            .. OneToManyCheckrs(scope),
+            .. RejectedCreateCheckrs(scope),
+            .. RejectedUpdateCheckrs(scope),
+            .. RejectedDeleteCheckrs(scope),
+            .. DeleteCheckr(scope),
+            CreateSeveralCheckr(scope)
+        ];
 
     private IList<CheckrOf<Case>> CruCheckrs(IPersistenceScope scope) => [
         CreateCheckr(scope),
@@ -36,6 +52,30 @@ where TEntity : class
 
     private IList<CheckrOf<Case>> DeleteCheckr(IPersistenceScope<TReader> scope) => [
         Trackr.OneOfPool<TEntity>("Entity", info => DeleteCheckr(scope, info))];
+
+    private IList<CheckrOf<Case>> RejectedCreateCheckrs(IPersistenceScope<TReader> scope)
+    {
+        var scenario = RejectedOperations(scope);
+        return [.. rejectedCreates.Select(operation => scenario.Create(operation, Creator))];
+    }
+
+    private IList<CheckrOf<Case>> RejectedUpdateCheckrs(IPersistenceScope<TReader> scope)
+    {
+        var scenario = RejectedOperations(scope);
+        return [.. rejectedUpdates.Select(operation =>
+            Trackr.OneOfPool<TEntity>("Entity", element => scenario.Update(operation, element)))];
+    }
+
+    private IList<CheckrOf<Case>> RejectedDeleteCheckrs(IPersistenceScope<TReader> scope)
+    {
+        var scenario = RejectedOperations(scope);
+        return [.. rejectedDeletes.Select(operation =>
+            Trackr.OneOfPool<TEntity>("Entity", element => scenario.Delete(operation, element)))];
+    }
+
+    private RejectedOperationScenario<TReader, TEntity, TId> RejectedOperations(
+        IPersistenceScope<TReader> scope) =>
+        new(identitySelector, propertyChecks, scope);
 
     private readonly FuzzrOf<TEntity> Creator =
         from ignore in Configr.Ignore(identitySelector.Properties.Contains)

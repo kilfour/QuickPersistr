@@ -24,12 +24,48 @@ where TEntity : class
         propertyChecks.Add(new(
             propertyInfo.Name,
             entity => getValue(entity),
-            (expected, actual) => equals(getValue(expected), getValue(actual))));
+            (expected, actual) => equals((TProp)expected!, (TProp)actual!)));
         return this;
     }
 
     private readonly List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies = [];
     private readonly List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks = [];
+    private readonly List<RejectedOperation<TEntity>> rejectedCreates = [];
+    private readonly List<RejectedOperation<TEntity>> rejectedUpdates = [];
+    private readonly List<RejectedOperation<TEntity>> rejectedDeletes = [];
+
+    public PersistenceProperties<TReader, TEntity, TId> CreateRejected<TException>(
+        string description,
+        Action<TEntity> attempt)
+    where TException : Exception =>
+        AddRejected<TException>(rejectedCreates, description, attempt);
+
+    public PersistenceProperties<TReader, TEntity, TId> CreateRejected<TException>(
+        string description)
+    where TException : Exception =>
+        CreateRejected<TException>(description, _ => { });
+
+    public PersistenceProperties<TReader, TEntity, TId> UpdateRejected<TException>(
+        string description,
+        Action<TEntity> attempt)
+    where TException : Exception =>
+        AddRejected<TException>(rejectedUpdates, description, attempt);
+
+    public PersistenceProperties<TReader, TEntity, TId> UpdateRejected<TException>(
+        string description)
+    where TException : Exception =>
+        UpdateRejected<TException>(description, _ => { });
+
+    public PersistenceProperties<TReader, TEntity, TId> DeleteRejected<TException>(
+        string description,
+        Action<TEntity> attempt)
+    where TException : Exception =>
+        AddRejected<TException>(rejectedDeletes, description, attempt);
+
+    public PersistenceProperties<TReader, TEntity, TId> DeleteRejected<TException>(
+        string description)
+    where TException : Exception =>
+        DeleteRejected<TException>(description, _ => { });
 
     public PersistenceProperties<TReader, TEntity, TId> HasMany(
         Func<HasManyFrom<TEntity, TReader, TId>, Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> many)
@@ -50,5 +86,28 @@ where TEntity : class
     }
 
     public PersistenceSpecification<TReader, TEntity, TId> Persist()
-        => new(identitySelector, propertyChecks, oneToManies, afterDeleteChecks);
+        => new(
+            identitySelector,
+            propertyChecks,
+            oneToManies,
+            afterDeleteChecks,
+            rejectedCreates,
+            rejectedUpdates,
+            rejectedDeletes);
+
+    private PersistenceProperties<TReader, TEntity, TId> AddRejected<TException>(
+        List<RejectedOperation<TEntity>> operations,
+        string description,
+        Action<TEntity> attempt)
+    where TException : Exception
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        ArgumentNullException.ThrowIfNull(attempt);
+
+        operations.Add(new(
+            description,
+            attempt,
+            (label, result) => Checkr.ExpectThrewExactly<TException>(label, result)));
+        return this;
+    }
 }
