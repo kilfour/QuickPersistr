@@ -22,9 +22,9 @@ where TChild : class
 
     private CheckrOf<AddedRelationship> AddChildren(PoolElement<TEntity> element) =>
         from sourceId in Checkr.Capture(
-            () => (TId)definition.PrimaryKey.GetValue(element.Value)!)
+            () => definition.Identity.Select(element.Value))
         from source in Checkr.Capture(
-            () => scope.GetById<TEntity>(sourceId))
+            () => definition.Identity.GetById<TEntity>(scope, sourceId))
         from children in Checkr.Input(
             "Children",
             definition.ChildFuzzr.Many(definition.Reassign is null ? 2 : 3))
@@ -91,7 +91,7 @@ where TChild : class
                 CommitAndStartNewSession();
             })
         from destinationId in Checkr.Capture(
-            () => (TId)definition.PrimaryKey.GetValue(destination)!)
+            () => definition.Identity.Select(destination))
         from sourceForMove in Checkr.Capture(
             () => definition.Reload(scope.Reader, removed.SourceId))
         from destinationForMove in Checkr.Capture(
@@ -162,7 +162,7 @@ where TChild : class
                 $"Actual:   {report.IntroduceThis(children.Where(child => definition.Contains(entity, child)).ToList())}"]);
 
     private FuzzrOf<TEntity> EntityCreator =>
-        from ignore in Configr.Ignore(property => property == definition.PrimaryKey)
+        from ignore in Configr.Ignore(definition.Identity.Properties.Contains)
         from entity in Fuzzr.One<TEntity>()
         select entity;
 

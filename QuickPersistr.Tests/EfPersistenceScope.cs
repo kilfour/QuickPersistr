@@ -41,6 +41,10 @@ where TDbContext : DbContext
     where TEntity : class
         => context.Find<TEntity>(id)!;
 
+    public TEntity GetById<TEntity>(object?[] identity)
+    where TEntity : class
+        => context.Find<TEntity>(identity)!;
+
     public TEntity Add<TEntity>(TEntity entity)
     {
         context.Add(entity!);
@@ -52,6 +56,15 @@ where TDbContext : DbContext
     {
         ArgumentNullException.ThrowIfNull(id);
         var entity = context.Set<TEntity>().Find(id);
+        if (entity is null)
+            return;
+        context.Set<TEntity>().Remove(entity);
+    }
+
+    public void DeleteById<TEntity>(object?[] identity)
+    where TEntity : class
+    {
+        var entity = context.Find<TEntity>(identity);
         if (entity is null)
             return;
         context.Set<TEntity>().Remove(entity);

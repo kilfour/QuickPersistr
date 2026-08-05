@@ -1,12 +1,11 @@
-using System.Reflection;
 using QuickCheckr;
 using QuickCheckr.UnderTheHood;
 using QuickFuzzr;
 
 namespace QuickPersistr.UnderTheHood;
 
-public class PersistenceSpecification<TReader, TEntity>(
-    PropertyInfo primaryKeyPropertyInfo,
+public class PersistenceSpecification<TReader, TEntity, TId>(
+    IdentitySelector<TEntity, TId> identitySelector,
     List<PropertyCheck<TEntity>> propertyChecks,
     List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies,
     List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks)
@@ -14,6 +13,7 @@ public class PersistenceSpecification<TReader, TEntity>(
 where TEntity : class
 {
     private readonly string entityName = typeof(TEntity).Name;
+    private readonly string identityName = identitySelector.QualifiedName(typeof(TEntity).Name);
 
     public int CheckrCount => 5 + oneToManies.Count;
 
@@ -38,12 +38,12 @@ where TEntity : class
         Trackr.OneOfPool<TEntity>("Entity", info => DeleteCheckr(scope, info))];
 
     private readonly FuzzrOf<TEntity> Creator =
-        from ignore in Configr.Ignore(a => a == primaryKeyPropertyInfo)
+        from ignore in Configr.Ignore(identitySelector.Properties.Contains)
         from entity in Fuzzr.One<TEntity>()
         select entity;
 
     private FuzzrOf<TEntity> Modifier(TEntity course) =>
-        from ignore in Configr.Ignore(a => a == primaryKeyPropertyInfo)
+        from ignore in Configr.Ignore(identitySelector.Properties.Contains)
         from entity in Fuzzr.One(() => course)
         select entity;
 
@@ -56,24 +56,24 @@ where TEntity : class
         })
         from canCreate in Checkr.Expect(
             $"Can Create {entityName}",
-            () => IsNonDefaultPrimaryKey(primaryKeyPropertyInfo.GetValue(entity)),
+            () => identitySelector.IsNonDefault(identitySelector.Select(entity)),
             report => [
-                $"Expected: Non-default {entityName}.{primaryKeyPropertyInfo.Name}",
-                $"Actual:   {report.IntroduceThis(primaryKeyPropertyInfo.GetValue(entity))}"])
+                $"Expected: Non-default {identityName}",
+                $"Actual:   {report.IntroduceThis(identitySelector.Select(entity))}"])
         from stored in Trackr.ToPool("Entity", () => entity)
         select Case.Closed;
 
     private CheckrOf<Case> ReadCheckr(PoolElement<TEntity> info, IPersistenceScope scope) =>
         from entity in Checkr.Act($"Read {entityName}", () =>
-            scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
+            identitySelector.GetById<TEntity>(scope, identitySelector.Select(info.Value)))
         from canReadPrimaryKey in Checkr.Expect(
-            $"Can Read {entityName}.{primaryKeyPropertyInfo.Name}",
-            () => Equals(
-                primaryKeyPropertyInfo.GetValue(info.Value),
-                primaryKeyPropertyInfo.GetValue(entity)),
+            $"Can Read {identityName}",
+            () => identitySelector.Comparer.Equals(
+                identitySelector.Select(info.Value),
+                identitySelector.Select(entity)),
             report => [
-                $"Expected: {report.IntroduceThis(primaryKeyPropertyInfo.GetValue(info.Value))}",
-                $"Actual:   {report.IntroduceThis(primaryKeyPropertyInfo.GetValue(entity))}"])
+                $"Expected: {report.IntroduceThis(identitySelector.Select(info.Value))}",
+                $"Actual:   {report.IntroduceThis(identitySelector.Select(entity))}"])
         from canRead in Combine.Checkrs(
             propertyChecks.Select(a =>
                 Checkr.Expect($"Can Read {entityName}.{a.Name}", () => a.Check(info.Value, entity),
@@ -83,11 +83,12 @@ where TEntity : class
         select Case.Closed;
 
     private CheckrOf<Case> UpdateCheckr(IPersistenceScope scope, PoolElement<TEntity> info) =>
-        from entity in Checkr.Capture(() => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
+        from entity in Checkr.Capture(() =>
+            identitySelector.GetById<TEntity>(scope, identitySelector.Select(info.Value)))
         from updatedEntity in Checkr.Input("Updated Entity", Modifier(entity))
         from updated in Checkr.Act($"Update {entityName}", () => CommitAndStartNewSession(scope))
         from reloaded in Checkr.Capture(
-            () => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
+            () => identitySelector.GetById<TEntity>(scope, identitySelector.Select(info.Value)))
         from canRead in Combine.Checkrs(
             propertyChecks.Select(a =>
                 Checkr.Expect($"Can Update {entityName}.{a.Name}",
@@ -102,11 +103,11 @@ where TEntity : class
         from delete in Checkr.Act($"Delete {entityName}",
             () =>
             {
-                scope.DeleteById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value));
+                identitySelector.DeleteById<TEntity>(scope, identitySelector.Select(info.Value));
                 CommitAndStartNewSession(scope);
             })
         from reloaded in Checkr.Capture(
-            () => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
+            () => identitySelector.GetById<TEntity>(scope, identitySelector.Select(info.Value)))
         from canDelete in Checkr.Expect($"Can Delete {entityName}", () => reloaded is null)
         from afterDelete in Combine.Checkrs(
             afterDeleteChecks.Select(check =>
@@ -127,19 +128,19 @@ where TEntity : class
             CommitAndStartNewSession(scope);
         })
         from identities in Checkr.Capture(() => entities
-            .Select(primaryKeyPropertyInfo.GetValue)
+            .Select(identitySelector.Select)
             .ToList())
         from nonDefault in Checkr.Expect(
             $"Can Create Several {entityName}",
-            () => identities.Count == 2 && identities.All(IsNonDefaultPrimaryKey),
+            () => identities.Count == 2 && identities.All(identitySelector.IsNonDefault),
             report => [
-                $"Expected: 2 non-default {entityName}.{primaryKeyPropertyInfo.Name} values",
+                $"Expected: 2 non-default {identityName} values",
                 $"Actual:   {report.IntroduceThis(identities)}"])
         from unique in Checkr.Expect(
-            $"Can Create Unique {entityName}.{primaryKeyPropertyInfo.Name}",
-            () => identities.Distinct().Count() == identities.Count,
+            $"Can Create Unique {identityName}",
+            () => identities.Distinct(identitySelector.Comparer).Count() == identities.Count,
             report => [
-                $"Expected: {identities.Count} distinct {entityName}.{primaryKeyPropertyInfo.Name} values",
+                $"Expected: {identities.Count} distinct {identityName} values",
                 $"Actual:   {report.IntroduceThis(identities)}"])
         select Case.Closed;
 
@@ -150,7 +151,8 @@ where TEntity : class
         FuzzrOf<TChild> childFuzzr,
         IPersistenceScope scope)
     where T : class =>
-        from entity in Checkr.Capture(() => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
+        from entity in Checkr.Capture(() =>
+            identitySelector.GetById<T>(scope, identitySelector.Select((info.Value as TEntity)!)))
         from children in Checkr.Input("Children", childFuzzr.Many(1, 3))
         from updated in Checkr.Act("Add Many", () =>
         {
@@ -161,7 +163,7 @@ where TEntity : class
             CommitAndStartNewSession(scope);
         })
         from reloaded in Checkr.Capture(
-            () => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
+            () => identitySelector.GetById<T>(scope, identitySelector.Select((info.Value as TEntity)!)))
         from canUpdate in Trackr.PoolExpectEach<TChild>($"{entityName} Has Many",
             child => check(reloaded, child))
         from stored in info.Replace(reloaded)
@@ -173,11 +175,4 @@ where TEntity : class
         scope.StartNewSession();
     }
 
-    private bool IsNonDefaultPrimaryKey(object? value)
-    {
-        var defaultValue = primaryKeyPropertyInfo.PropertyType.IsValueType
-            ? Activator.CreateInstance(primaryKeyPropertyInfo.PropertyType)
-            : null;
-        return !Equals(value, defaultValue);
-    }
 }

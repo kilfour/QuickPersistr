@@ -1,16 +1,16 @@
-using System.Reflection;
 using QuickCheckr;
 using QuickFuzzr;
 
 namespace QuickPersistr.UnderTheHood.Many;
 
-public class HasManyFrom<TEntity, TReader, TId>(PropertyInfo primaryKeyPropertyInfo)
+public class HasManyFrom<TEntity, TReader, TId>(
+    IdentitySelector<TEntity, TId> identitySelector)
 where TEntity : class
 {
     public HasManyAdd<TEntity, TReader, TChild, TId> From<TChild>(
         Persistence<TReader, TChild> childPersistence)
     where TChild : class =>
-        new(new(primaryKeyPropertyInfo, childPersistence.Define().GetCreator<TChild>()));
+        new(new(identitySelector, childPersistence.Define().GetCreator<TChild>()));
 }
 
 public class HasManyAdd<TEntity, TReader, TChild, TId>(

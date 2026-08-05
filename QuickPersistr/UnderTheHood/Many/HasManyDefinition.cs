@@ -1,10 +1,9 @@
-using System.Reflection;
 using QuickFuzzr;
 
 namespace QuickPersistr.UnderTheHood.Many;
 
 public record HasManyDefinition<TEntity, TReader, TChild, TId>(
-    PropertyInfo PrimaryKey,
+    IdentitySelector<TEntity, TId> Identity,
     FuzzrOf<TChild> ChildFuzzr)
 where TEntity : class
 where TChild : class

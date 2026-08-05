@@ -1,11 +1,11 @@
 using System.Linq.Expressions;
-using System.Reflection;
 using QuickCheckr;
 using QuickPersistr.UnderTheHood.Many;
 
 namespace QuickPersistr.UnderTheHood;
 
-public class PersistenceProperties<TReader, TEntity, TId>(PropertyInfo primaryKeyPropertyInfo)
+public class PersistenceProperties<TReader, TEntity, TId>(
+    IdentitySelector<TEntity, TId> identitySelector)
 where TEntity : class
 {
     private readonly List<PropertyCheck<TEntity>> propertyChecks = [];
@@ -34,7 +34,7 @@ where TEntity : class
     public PersistenceProperties<TReader, TEntity, TId> HasMany(
         Func<HasManyFrom<TEntity, TReader, TId>, Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> many)
     {
-        oneToManies.Add(many(new HasManyFrom<TEntity, TReader, TId>(primaryKeyPropertyInfo)));
+        oneToManies.Add(many(new HasManyFrom<TEntity, TReader, TId>(identitySelector)));
         return this;
     }
 
@@ -49,6 +49,6 @@ where TEntity : class
         return this;
     }
 
-    public PersistenceSpecification<TReader, TEntity> Persist()
-        => new(primaryKeyPropertyInfo, propertyChecks, oneToManies, afterDeleteChecks);
+    public PersistenceSpecification<TReader, TEntity, TId> Persist()
+        => new(identitySelector, propertyChecks, oneToManies, afterDeleteChecks);
 }
