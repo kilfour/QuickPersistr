@@ -1,0 +1,18 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Post: 1x
+ - Can Read Post.Id: 1x
+ - Can Read Post.Status: 1x
+ - Can Read Post.Version: 1x
+ - Can Update Post.Status: 1x
+ - Can Update Post.Version: 1x
+ - Rejects Stale Post Update: ChangeStatus: 1x
+ - Concurrent ChangeStatus Preserves Post.Id: 1x
+ - Concurrent ChangeStatus Persists Winner Post.Status: 1x
+ - Concurrent ChangeStatus Persists Winner Post.Version: 1x
+ - Can Delete Post: 1x
+ - Can Create Several Post: 1x
+ - Can Create Unique Post.Id: 1x
+ ------------------------------------------------------------

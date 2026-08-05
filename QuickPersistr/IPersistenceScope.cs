@@ -34,4 +34,12 @@ public interface IPersistenceScope
 public interface IPersistenceScope<TReader> : IPersistenceScope
 {
     IPersistenceReader<TReader> Reader { get; }
+
+    IConcurrentPersistenceScope<TReader> OpenConcurrentSession() =>
+        throw new NotSupportedException(
+            $"{GetType().Name} does not support concurrent sessions.");
 }
+
+public interface IConcurrentPersistenceScope<TReader> :
+    IPersistenceScope<TReader>,
+    IDisposable;

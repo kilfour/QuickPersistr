@@ -34,20 +34,14 @@ where TEntity : class
     private readonly List<RejectedOperation<TEntity>> rejectedUpdates = [];
     private readonly List<RejectedOperation<TEntity>> rejectedDeletes = [];
     private readonly List<DomainMutation<TEntity>> domainUpdates = [];
+    private readonly List<OptimisticConcurrency<TEntity>> concurrencyScenarios = [];
 
     public PersistenceProperties<TReader, TEntity, TId> Update(
         Expression<Action<TEntity>> mutation)
     {
         ArgumentNullException.ThrowIfNull(mutation);
 
-        if (mutation.Body is not MethodCallExpression methodCall)
-        {
-            throw new ArgumentException(
-                "An inferred update must be a domain method call.",
-                nameof(mutation));
-        }
-
-        return Update(methodCall.Method.Name, mutation.Compile());
+        return Update(MutationName(mutation, nameof(mutation)), mutation.Compile());
     }
 
     public PersistenceProperties<TReader, TEntity, TId> Update(
@@ -58,6 +52,44 @@ where TEntity : class
         ArgumentNullException.ThrowIfNull(mutation);
 
         domainUpdates.Add(new(description, mutation));
+        return this;
+    }
+
+    public PersistenceProperties<TReader, TEntity, TId> OptimisticConcurrency<TException>(
+        Expression<Action<TEntity>> winningUpdate,
+        Expression<Action<TEntity>> conflictingUpdate)
+    where TException : Exception
+    {
+        ArgumentNullException.ThrowIfNull(winningUpdate);
+        ArgumentNullException.ThrowIfNull(conflictingUpdate);
+
+        var winningName = MutationName(winningUpdate, nameof(winningUpdate));
+        var conflictingName = MutationName(conflictingUpdate, nameof(conflictingUpdate));
+        var description = winningName == conflictingName
+            ? winningName
+            : $"{winningName} / {conflictingName}";
+
+        return OptimisticConcurrency<TException>(
+            description,
+            winningUpdate.Compile(),
+            conflictingUpdate.Compile());
+    }
+
+    public PersistenceProperties<TReader, TEntity, TId> OptimisticConcurrency<TException>(
+        string description,
+        Action<TEntity> winningUpdate,
+        Action<TEntity> conflictingUpdate)
+    where TException : Exception
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        ArgumentNullException.ThrowIfNull(winningUpdate);
+        ArgumentNullException.ThrowIfNull(conflictingUpdate);
+
+        concurrencyScenarios.Add(new(
+            description,
+            winningUpdate,
+            conflictingUpdate,
+            (label, result) => Checkr.ExpectThrewExactly<TException>(label, result)));
         return this;
     }
 
@@ -121,7 +153,8 @@ where TEntity : class
             rejectedCreates,
             rejectedUpdates,
             rejectedDeletes,
-            domainUpdates);
+            domainUpdates,
+            concurrencyScenarios);
 
     private PersistenceProperties<TReader, TEntity, TId> AddRejected<TException>(
         List<RejectedOperation<TEntity>> operations,
@@ -137,5 +170,17 @@ where TEntity : class
             attempt,
             (label, result) => Checkr.ExpectThrewExactly<TException>(label, result)));
         return this;
+    }
+
+    private static string MutationName(
+        Expression<Action<TEntity>> mutation,
+        string parameterName)
+    {
+        if (mutation.Body is MethodCallExpression methodCall)
+            return methodCall.Method.Name;
+
+        throw new ArgumentException(
+            "An inferred mutation must be a domain method call.",
+            parameterName);
     }
 }

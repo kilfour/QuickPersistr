@@ -1,0 +1,28 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                MissingOptimisticConcurrencyTests.cs:56:1
+ Original failing run:    4 executions
+ Minimal failing case:    2 executions (after 2 shrinks)
+ Seed:                    2099349753
+ ------------------------------------------------------------
+  Executed: Create Post
+   - Entity = Post-1
+   - Entity = { Id: 1, Status: Draft, Version: 0 }
+ ------------------------------------------------------------
+  Executed: Update Post Concurrently: ChangeStatus
+   - Entity = Post-1
+ ==================================================================
+  !! Expectation Failed: Rejects Stale Post Update: ChangeStatus
+       Expected: DbUpdateConcurrencyException
+       Actual:   No Exception was thrown.
+ ==================================================================
+ Passed Expectations
+ - Can Create Post: 1x
+ - Can Read Post.Id: 1x
+ - Can Read Post.Status: 1x
+ - Can Read Post.Version: 1x
+ - Can Update Post.Status: 1x
+ - Can Update Post.Version: 1x
+ - Concurrent ChangeStatus Preserves Post.Id: 1x
+ - Concurrent ChangeStatus Persists Winner Post.Version: 1x
+ ------------------------------------------------------------

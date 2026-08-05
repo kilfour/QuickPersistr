@@ -12,7 +12,8 @@ public class PersistenceSpecification<TReader, TEntity, TId>(
     List<RejectedOperation<TEntity>> rejectedCreates,
     List<RejectedOperation<TEntity>> rejectedUpdates,
     List<RejectedOperation<TEntity>> rejectedDeletes,
-    List<DomainMutation<TEntity>> domainUpdates)
+    List<DomainMutation<TEntity>> domainUpdates,
+    List<OptimisticConcurrency<TEntity>> concurrencyScenarios)
 : IPersistenceSpecification<TReader>
 where TEntity : class
 {
@@ -25,7 +26,8 @@ where TEntity : class
         rejectedCreates.Count +
         rejectedUpdates.Count +
         rejectedDeletes.Count +
-        domainUpdates.Count;
+        domainUpdates.Count +
+        concurrencyScenarios.Count;
 
     public FuzzrOf<T> GetCreator<T>()
     where T : class
@@ -35,6 +37,7 @@ where TEntity : class
         [
             .. CruCheckrs(scope),
             .. DomainUpdateCheckrs(scope),
+            .. OptimisticConcurrencyCheckrs(scope),
             .. OneToManyCheckrs(scope),
             .. RejectedCreateCheckrs(scope),
             .. RejectedUpdateCheckrs(scope),
@@ -64,6 +67,17 @@ where TEntity : class
             scope);
         return [.. domainUpdates.Select(mutation =>
             Trackr.OneOfPool<TEntity>("Entity", element => scenario.Check(mutation, element)))];
+    }
+
+    private IList<CheckrOf<Case>> OptimisticConcurrencyCheckrs(
+        IPersistenceScope<TReader> scope)
+    {
+        var runner = new OptimisticConcurrencyScenario<TReader, TEntity, TId>(
+            identitySelector,
+            propertyChecks,
+            scope);
+        return [.. concurrencyScenarios.Select(scenario =>
+            Trackr.OneOfPool<TEntity>("Entity", element => runner.Check(scenario, element)))];
     }
 
     private IList<CheckrOf<Case>> RejectedCreateCheckrs(IPersistenceScope<TReader> scope)
