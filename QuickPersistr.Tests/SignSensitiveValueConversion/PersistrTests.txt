@@ -19,4 +19,5 @@
  ======================================================
  Passed Expectations
  - Can Create LedgerEntry: 1x
+ - Can Read LedgerEntry.Id: 1x
  ------------------------------------------------------------

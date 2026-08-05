@@ -2,19 +2,20 @@
  Test:                    Example
  Location:                PersistrTests.cs:62:1
  Original failing run:    2 executions
- Seed:                    1527459527
+ Seed:                    1746151002
  ------------------------------------------------------------
   Executed: Create Course
    - Entity = Course-1
-   - Entity = { Name: { Value: "rcjsa" }, DateRange: { StartDate: 1.January(2026), EndDate: 9.January(2026) }, TimeRange: { StartTime: 0.Past(15).Seconds(36, 218), EndTime: 12.To(22).Seconds(10, 536) }, Days: [ { Day: Friday, Mode: RemoteLearning }, { Day: Tuesday, Mode: RemoteLearning }, { Day: Tuesday, Mode: RemoteLearning }, { Day: Tuesday, Mode: RemoteLearning }, { Day: Monday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: 4aade701-75f1-4c86-8ab9-25f973c2ae9c } }
+   - Entity = { Name: { Value: "ysrcijcjxwfwerwkexshcegmsyjhjrvfibxaftpcdfomxilkyxjkaymtme" }, DateRange: { StartDate: 1.January(2026), EndDate: 12.January(2026) }, TimeRange: { StartTime: 26.To(9).Seconds(49, 38), EndTime: 10.To(11).Seconds(3, 433) }, Days: [ { Day: Friday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Friday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: 36ac8fd8-b1b5-4f22-8dff-33637cc70008 } }
  ------------------------------------------------------------
   Executed: Read Course
    - Entity = Course-1
  ===============================================
   !! Expectation Failed: Can Read Course.Days
-       Expected: [ { Day: Friday, Mode: RemoteLearning }, { Day: Tuesday, Mode: RemoteLearning }, { Day: Tuesday, Mode: RemoteLearning }, { Day: Tuesday, Mode: RemoteLearning }, { Day: Monday, Mode: RemoteLearning } ]
-       Actual:   [ { Day: Friday, Mode: OnCampus }, { Day: Tuesday, Mode: OnCampus }, { Day: Tuesday, Mode: OnCampus }, { Day: Tuesday, Mode: OnCampus }, { Day: Monday, Mode: OnCampus } ]
+       Expected: [ { Day: Friday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Friday, Mode: RemoteLearning } ]
+       Actual:   [ { Day: Friday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Friday, Mode: OnCampus } ]
  ===============================================
  Passed Expectations
  - Can Create Course: 1x
+ - Can Read Course.Id: 1x
  ------------------------------------------------------------

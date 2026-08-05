@@ -3,6 +3,7 @@
  ------------------------------------------------------------
  Passed Expectations
  - Can Create Course: 1x
+ - Can Read Course.Id: 1x
  - Can Read Course.Name: 1x
  - Can Read Course.TimeRange: 1x
  - Can Read Course.DateRange: 1x
@@ -14,4 +15,6 @@
  - Can Update Course.Days: 1x
  - Can Update Course.IsDeleted: 1x
  - Can Delete Course: 1x
+ - Can Create Several Course: 1x
+ - Can Create Unique Course.Id: 1x
  ------------------------------------------------------------

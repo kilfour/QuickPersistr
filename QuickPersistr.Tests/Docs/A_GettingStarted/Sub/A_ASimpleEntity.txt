@@ -17,6 +17,7 @@
  ======================================================
  Passed Expectations
  - Can Create Book: 1x
+ - Can Read Book.Id: 1x
  - Can Read Book.Title: 1x
  - Can Read Book.Description: 1x
  - Can Update Book.Title: 1x

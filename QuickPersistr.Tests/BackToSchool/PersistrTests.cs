@@ -44,14 +44,17 @@ public class CoursePersistence : BackToSchoolPersistence<Course>
             .Property(a => a.Description)
             .HasMany(many => many
                 .From(new StudentPersistence())
-                .AddOne((course, student) => course.Students.Add(student))
-                .Added((course, student) => course.Students.Any(a => a.Id == student.Id))
+                .Add((course, student) => course.Students.Add(student))
+                .Remove((course, student) => course.Students.RemoveAll(
+                    candidate => candidate.Id == student.Id))
+                .Clear(a => a.Students.Clear())
                 .Reload((reader, id) => reader.Query(
                     a => a.Set<Course>()
                         .Include(course => course.Students)
                         .Single(course => course.Id == id)))
-                .Clear(a => a.Students.Clear())
-                .Cleared(a => a.Students.Count == 0))
+                .Contains((course, student) => course.Students.Any(
+                    candidate => candidate.Id == student.Id))
+                .Empty(a => a.Students.Count == 0))
             .Persist();
 }
 

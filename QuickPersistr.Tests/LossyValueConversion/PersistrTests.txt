@@ -3,7 +3,7 @@
  Location:                PersistrTests.cs:56:1
  Original failing run:    2 executions
  Minimal failing case:    2 executions (after 1 shrink)
- Seed:                    633442700
+ Seed:                    575842212
  ------------------------------------------------------------
   Executed: Create AuditEntry
    - Entity = AuditEntry-1
@@ -18,4 +18,5 @@
  =========================================================
  Passed Expectations
  - Can Create AuditEntry: 1x
+ - Can Read AuditEntry.Id: 1x
  ------------------------------------------------------------

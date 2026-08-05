@@ -2,7 +2,7 @@
  Test:                    Example
  Location:                PersistrTests.cs:62:1
  Original failing run:    2 executions
- Seed:                    1300772408
+ Seed:                    860802767
  ------------------------------------------------------------
   Executed: Create Payment
    - Entity = Payment-1
@@ -17,4 +17,5 @@
  ==================================================
  Passed Expectations
  - Can Create Payment: 1x
+ - Can Read Payment.Id: 1x
  ------------------------------------------------------------
