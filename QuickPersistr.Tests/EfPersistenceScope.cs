@@ -9,9 +9,15 @@ where TDbContext : DbContext
     private readonly SqliteConnection connection;
     private readonly TDbContext context;
 
-    public EfPersistenceScope(Func<DbContextOptions<TDbContext>, TDbContext> contextFactory)
+    public EfPersistenceScope(
+        Func<DbContextOptions<TDbContext>, TDbContext> contextFactory,
+        bool enforceForeignKeys = true)
     {
-        connection = new SqliteConnection("Data Source=:memory:");
+        connection = new SqliteConnection(new SqliteConnectionStringBuilder
+        {
+            DataSource = ":memory:",
+            ForeignKeys = enforceForeignKeys
+        }.ToString());
         connection.Open();
         var options = new DbContextOptionsBuilder<TDbContext>()
             .UseSqlite(connection)

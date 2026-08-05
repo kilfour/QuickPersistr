@@ -8,7 +8,8 @@ namespace QuickPersistr.UnderTheHood;
 public class PersistenceSpecification<TReader, TEntity>(
     PropertyInfo primaryKeyPropertyInfo,
     List<PropertyCheck<TEntity>> propertyChecks,
-    List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies)
+    List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies,
+    List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks)
 : IPersistenceSpecification<TReader>
 where TEntity : class
 {
@@ -33,7 +34,7 @@ where TEntity : class
             Trackr.OneOfPool<TEntity>("Entity", info
                 => a(scope,info)))];
 
-    private IList<CheckrOf<Case>> DeleteCheckr(IPersistenceScope scope) => [
+    private IList<CheckrOf<Case>> DeleteCheckr(IPersistenceScope<TReader> scope) => [
         Trackr.OneOfPool<TEntity>("Entity", info => DeleteCheckr(scope, info))];
 
     private readonly FuzzrOf<TEntity> Creator =
@@ -88,7 +89,7 @@ where TEntity : class
         from stored in info.Replace(reloaded)
         select Case.Closed;
 
-    private CheckrOf<Case> DeleteCheckr(IPersistenceScope scope, PoolElement<TEntity> info) =>
+    private CheckrOf<Case> DeleteCheckr(IPersistenceScope<TReader> scope, PoolElement<TEntity> info) =>
         from delete in Checkr.Act($"Delete {entityName}",
             () =>
             {
@@ -98,6 +99,11 @@ where TEntity : class
         from reloaded in Checkr.Capture(
             () => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
         from canDelete in Checkr.Expect($"Can Delete {entityName}", () => reloaded is null)
+        from afterDelete in Combine.Checkrs(
+            afterDeleteChecks.Select(check =>
+                Checkr.Expect(
+                    $"Deleting {entityName} {check.Description}",
+                    () => check.Check(scope.Reader, info.Value))))
         from stored in info.Remove()
         select Case.Closed;
 

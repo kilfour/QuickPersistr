@@ -29,6 +29,7 @@ where TEntity : class
     }
 
     private readonly List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies = [];
+    private readonly List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks = [];
 
     public PersistenceProperties<TReader, TEntity, TId> HasMany(
         Func<HasManyFrom<TEntity, TReader, TId>, Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> many)
@@ -37,6 +38,17 @@ where TEntity : class
         return this;
     }
 
+    public PersistenceProperties<TReader, TEntity, TId> AfterDelete(
+        string description,
+        Func<IPersistenceReader<TReader>, TEntity, bool> check)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        ArgumentNullException.ThrowIfNull(check);
+
+        afterDeleteChecks.Add(new(description, check));
+        return this;
+    }
+
     public PersistenceSpecification<TReader, TEntity> Persist()
-        => new(primaryKeyPropertyInfo, propertyChecks, oneToManies);
+        => new(primaryKeyPropertyInfo, propertyChecks, oneToManies, afterDeleteChecks);
 }
