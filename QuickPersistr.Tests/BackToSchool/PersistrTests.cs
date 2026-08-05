@@ -47,6 +47,13 @@ public class CoursePersistence : BackToSchoolPersistence<Course>
                 .Add((course, student) => course.Students.Add(student))
                 .Remove((course, student) => course.Students.RemoveAll(
                     candidate => candidate.Id == student.Id))
+                .Reassign((source, destination, student) =>
+                {
+                    var persistedStudent = source.Students.Single(
+                        candidate => candidate.Id == student.Id);
+                    source.Students.Remove(persistedStudent);
+                    destination.Students.Add(persistedStudent);
+                })
                 .Clear(a => a.Students.Clear())
                 .Reload((reader, id) => reader.Query(
                     a => a.Set<Course>()
