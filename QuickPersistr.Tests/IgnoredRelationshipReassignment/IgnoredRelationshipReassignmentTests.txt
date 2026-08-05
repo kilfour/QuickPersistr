@@ -1,0 +1,36 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                IgnoredRelationshipReassignmentTests.cs:68:1
+ Original failing run:    4 executions
+ Minimal failing case:    4 executions (after 7 shrinks)
+ Seed:                    751926438
+ ------------------------------------------------------------
+  Executed: Create Team
+   - Entity = Team-1
+   - Entity = { Id: 1 }
+ ------------------------------------------------------------
+  Executed: Read Team
+   - Entity = Team-1
+ ------------------------------------------------------------
+  Executed: Update Team
+   - Entity         = Team-1
+   - Updated Entity = { Id: 1 }
+ ------------------------------------------------------------
+  Executed: Add Children, Clear Children, Create Destination Team, Reassign Child, Remove Child
+   - Entity   = Team-1
+   - Children = [ { Id: 1, TeamId: 1, Name: "nolv" }, { Id: 2, TeamId: 1, Name: "iqyraeowii" }, { Id: 3 } ]
+     Redux      [ { Id: 1, TeamId: 1, Name: "nolv" }, { Id: 2, TeamId: 1, Name: "iqyraeowii" }, { Id: 2 } ]
+ ======================================================
+  !! Expectation Failed: Source Team Releases Member
+       Expected: { Id: 2, TeamId: 1, Name: "iqyraeowii" } absent
+       Actual:   { Id: 2, TeamId: 1, Name: "iqyraeowii" } present
+ ======================================================
+ Passed Expectations
+ - Can Create Team: 1x
+ - Can Read Team.Id: 1x
+ - Team Can Add Member: 1x
+ - Team Can Remove Member: 1x
+ - Team Retains Other Member: 1x
+ - Source Team Retains Other Member: 1x
+ - Team Can Clear Member: 1x
+ ------------------------------------------------------------

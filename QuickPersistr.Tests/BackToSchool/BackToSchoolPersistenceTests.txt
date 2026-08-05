@@ -11,6 +11,9 @@
  - Course Can Add Student: 1x
  - Course Can Remove Student: 1x
  - Course Retains Other Student: 1x
+ - Source Course Releases Student: 1x
+ - Destination Course Receives Student: 1x
+ - Source Course Retains Other Student: 1x
  - Course Can Clear Student: 1x
  - Can Delete Course: 1x
  - Can Create Several Course: 1x

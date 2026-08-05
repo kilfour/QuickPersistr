@@ -2,18 +2,18 @@
  Test:                    Example
  Location:                IncorrectOwnedCollectionValueConversionTests.cs:62:1
  Original failing run:    2 executions
- Seed:                    1746151002
+ Seed:                    1067746694
  ------------------------------------------------------------
   Executed: Create Course
    - Entity = Course-1
-   - Entity = { Name: { Value: "ysrcijcjxwfwerwkexshcegmsyjhjrvfibxaftpcdfomxilkyxjkaymtme" }, DateRange: { StartDate: 1.January(2026), EndDate: 12.January(2026) }, TimeRange: { StartTime: 26.To(9).Seconds(49, 38), EndTime: 10.To(11).Seconds(3, 433) }, Days: [ { Day: Friday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Friday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: 36ac8fd8-b1b5-4f22-8dff-33637cc70008 } }
+   - Entity = { Name: { Value: "stbfnmzvrwgagnjhtfktobtgpqfwoiybjotefzzkvbyyijxffbqdgygqauqxgchjyfrrtfctgaxnduxfta" }, DateRange: { StartDate: 1.January(2026), EndDate: 20.January(2026) }, TimeRange: { StartTime: 9.Past(13).Seconds(2, 620), EndTime: 4.Past(20).Seconds(34, 582) }, Days: [ { Day: Monday, Mode: OnCampus }, { Day: Thursday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: cc7a01cc-3da7-44f0-904a-7d7a58c3ce8c } }
  ------------------------------------------------------------
   Executed: Read Course
    - Entity = Course-1
  ===============================================
   !! Expectation Failed: Can Read Course.Days
-       Expected: [ { Day: Friday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Friday, Mode: RemoteLearning } ]
-       Actual:   [ { Day: Friday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Wednesday, Mode: OnCampus }, { Day: Friday, Mode: OnCampus } ]
+       Expected: [ { Day: Monday, Mode: OnCampus }, { Day: Thursday, Mode: RemoteLearning } ]
+       Actual:   [ { Day: Monday, Mode: OnCampus }, { Day: Thursday, Mode: OnCampus } ]
  ===============================================
  Passed Expectations
  - Can Create Course: 1x

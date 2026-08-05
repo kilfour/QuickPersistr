@@ -1,0 +1,12 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create CatalogItem: 1x
+ - Can Read CatalogItem.(CatalogId, ItemCode): 1x
+ - Can Read CatalogItem.Description: 1x
+ - Can Update CatalogItem.Description: 1x
+ - Can Delete CatalogItem: 1x
+ - Can Create Several CatalogItem: 1x
+ - Can Create Unique CatalogItem.(CatalogId, ItemCode): 1x
+ ------------------------------------------------------------
