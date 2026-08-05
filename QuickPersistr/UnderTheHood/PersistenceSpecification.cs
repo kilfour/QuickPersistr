@@ -49,7 +49,11 @@ where TEntity : class
 
     private CheckrOf<Case> CreateCheckr(IPersistenceScope scope) =>
         from entity in Checkr.Input("Entity", Creator)
-        from create in Checkr.Act($"Create {entityName}", () => { scope.Add(entity); scope.Commit(); })
+        from create in Checkr.Act($"Create {entityName}", () =>
+        {
+            scope.Add(entity);
+            CommitAndStartNewSession(scope);
+        })
         from canCreate in Checkr.Expect($"Can Create {entityName}", () => primaryKeyPropertyInfo.GetValue(entity) != default)
         from stored in Trackr.ToPool("Entity", () => entity)
         select Case.Closed;
@@ -76,7 +80,7 @@ where TEntity : class
     private CheckrOf<Case> UpdateCheckr(IPersistenceScope scope, PoolElement<TEntity> info) =>
         from entity in Checkr.Capture(() => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
         from updatedEntity in Checkr.Input("Updated Entity", Modifier(entity))
-        from updated in Checkr.Act($"Update {entityName}", scope.Commit)
+        from updated in Checkr.Act($"Update {entityName}", () => CommitAndStartNewSession(scope))
         from reloaded in Checkr.Capture(
             () => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
         from canRead in Combine.Checkrs(
@@ -94,7 +98,7 @@ where TEntity : class
             () =>
             {
                 scope.DeleteById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value));
-                scope.Commit();
+                CommitAndStartNewSession(scope);
             })
         from reloaded in Checkr.Capture(
             () => scope.GetById<TEntity>(primaryKeyPropertyInfo.GetValue(info.Value)))
@@ -122,7 +126,7 @@ where TEntity : class
             {
                 apply(entity, child);
             }
-            scope.Commit();
+            CommitAndStartNewSession(scope);
         })
         from reloaded in Checkr.Capture(
             () => scope.GetById<T>(primaryKeyPropertyInfo.GetValue(info.Value)))
@@ -130,4 +134,10 @@ where TEntity : class
             child => check(reloaded, child))
         from stored in info.Replace(reloaded)
         select Case.Closed;
+
+    private static void CommitAndStartNewSession(IPersistenceScope scope)
+    {
+        scope.Commit();
+        scope.StartNewSession();
+    }
 }

@@ -7,22 +7,25 @@ public class EfPersistenceScope<TDbContext> : IDisposable, IPersistenceScope<TDb
 where TDbContext : DbContext
 {
     private readonly SqliteConnection connection;
-    private readonly TDbContext context;
+    private readonly DbContextOptions<TDbContext> options;
+    private readonly Func<DbContextOptions<TDbContext>, TDbContext> contextFactory;
+    private TDbContext context;
 
     public EfPersistenceScope(
         Func<DbContextOptions<TDbContext>, TDbContext> contextFactory,
         bool enforceForeignKeys = true)
     {
+        this.contextFactory = contextFactory;
         connection = new SqliteConnection(new SqliteConnectionStringBuilder
         {
             DataSource = ":memory:",
             ForeignKeys = enforceForeignKeys
         }.ToString());
         connection.Open();
-        var options = new DbContextOptionsBuilder<TDbContext>()
+        options = new DbContextOptionsBuilder<TDbContext>()
             .UseSqlite(connection)
             .Options;
-        context = contextFactory(options);
+        context = CreateContext();
         context.Database.EnsureCreated();
     }
 
@@ -55,10 +58,15 @@ where TDbContext : DbContext
     }
 
     public void Commit()
+        => context.SaveChanges();
+
+    public void StartNewSession()
     {
-        context.SaveChanges();
-        context.ChangeTracker.Clear();
+        context.Dispose();
+        context = CreateContext();
     }
 
     public EfReader<TDbContext> GetReader() => new(context);
+
+    private TDbContext CreateContext() => contextFactory(options);
 }

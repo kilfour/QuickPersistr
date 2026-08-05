@@ -7,6 +7,7 @@ public interface IPersistenceScope
     public void DeleteById<TEntity>(object? id)
     where TEntity : class;
     public void Commit();
+    public void StartNewSession();
 }
 
 public interface IPersistenceScope<TReader> : IPersistenceScope

@@ -102,16 +102,26 @@ where TEntity : class
                 {
                     apply(entity, child);
                 }
-                scope.Commit();
+                CommitAndStartNewSession(scope);
             })
             from reloaded in Checkr.Capture(
                 () => reload(scope.Reader, id))
             from canUpdate in Checkr.Expect($"{entityName} Can Add {childEntityName}", () => children.All(a => check(reloaded, a)))
-            from clearMany in Checkr.Act("Clear Children", () => { clear(reloaded); scope.Commit(); })
+            from clearMany in Checkr.Act("Clear Children", () =>
+            {
+                clear(reloaded);
+                CommitAndStartNewSession(scope);
+            })
             from reloadedCleared in Checkr.Capture(
                 () => reload(scope.Reader, id))
             from cleared in Checkr.Expect($"{entityName} Can Clear {childEntityName}", () => checkCleared(reloadedCleared))
             from stored in info.Replace(reloaded)
             select Case.Closed;
+    }
+
+    private static void CommitAndStartNewSession(IPersistenceScope scope)
+    {
+        scope.Commit();
+        scope.StartNewSession();
     }
 }
