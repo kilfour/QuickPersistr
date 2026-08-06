@@ -13,7 +13,8 @@ public class PersistenceSpecification<TReader, TEntity, TId>(
     List<RejectedOperation<TEntity>> rejectedUpdates,
     List<RejectedOperation<TEntity>> rejectedDeletes,
     List<DomainMutation<TEntity>> domainUpdates,
-    List<OptimisticConcurrency<TEntity>> concurrencyScenarios)
+    List<OptimisticConcurrency<TEntity>> concurrencyScenarios,
+    IReadOnlyList<Shrinker> entityShrinkers)
 : IPersistenceSpecification<TReader>
 where TEntity : class
 {
@@ -102,7 +103,7 @@ where TEntity : class
 
     private RejectedOperationScenario<TReader, TEntity, TId> RejectedOperations(
         IPersistenceScope<TReader> scope) =>
-        new(identitySelector, propertyChecks, scope);
+        new(identitySelector, propertyChecks, entityShrinkers, scope);
 
     private readonly FuzzrOf<TEntity> Creator =
         from ignore in Configr.Ignore(identitySelector.Properties.Contains)
@@ -115,7 +116,7 @@ where TEntity : class
         select entity;
 
     private CheckrOf<Case> CreateCheckr(IPersistenceScope scope) =>
-        from entity in Checkr.Input("Entity", Creator)
+        from entity in Checkr.Input("Entity", Creator, [.. entityShrinkers])
         from create in Checkr.Act($"Create {entityName}", () =>
         {
             scope.Add(entity);
@@ -152,7 +153,10 @@ where TEntity : class
     private CheckrOf<Case> UpdateCheckr(IPersistenceScope scope, PoolElement<TEntity> info) =>
         from entity in Checkr.Capture(() =>
             identitySelector.GetById<TEntity>(scope, identitySelector.Select(info.Value)))
-        from updatedEntity in Checkr.Input("Updated Entity", Modifier(entity))
+        from updatedEntity in Checkr.Input(
+            "Updated Entity",
+            Modifier(entity),
+            [.. entityShrinkers])
         from updated in Checkr.Act($"Update {entityName}", () => CommitAndStartNewSession(scope))
         from reloaded in Checkr.Capture(
             () => identitySelector.GetById<TEntity>(scope, identitySelector.Select(info.Value)))
@@ -185,7 +189,10 @@ where TEntity : class
         select Case.Closed;
 
     private CheckrOf<Case> CreateSeveralCheckr(IPersistenceScope scope) =>
-        from entities in Checkr.Input("Entities", Creator.Many(2))
+        from entities in Checkr.Input(
+            "Entities",
+            Creator.Many(2),
+            [.. entityShrinkers])
         from create in Checkr.Act($"Create Several {entityName}", () =>
         {
             foreach (var entity in entities)

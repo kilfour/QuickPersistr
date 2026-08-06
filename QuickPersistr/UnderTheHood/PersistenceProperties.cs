@@ -35,6 +35,22 @@ where TEntity : class
     private readonly List<RejectedOperation<TEntity>> rejectedDeletes = [];
     private readonly List<DomainMutation<TEntity>> domainUpdates = [];
     private readonly List<OptimisticConcurrency<TEntity>> concurrencyScenarios = [];
+    private readonly List<Shrinker> entityShrinkers = [];
+
+    public PersistenceProperties<TReader, TEntity, TId> Shrinking(
+        params Shrinker[] shrinkers)
+    {
+        ArgumentNullException.ThrowIfNull(shrinkers);
+        if (shrinkers.Any(shrinker => shrinker is null))
+        {
+            throw new ArgumentException(
+                "Entity shrinkers cannot contain null.",
+                nameof(shrinkers));
+        }
+
+        entityShrinkers.AddRange(shrinkers);
+        return this;
+    }
 
     public PersistenceProperties<TReader, TEntity, TId> Update(
         Expression<Action<TEntity>> mutation)
@@ -129,7 +145,9 @@ where TEntity : class
     public PersistenceProperties<TReader, TEntity, TId> HasMany(
         Func<HasManyFrom<TEntity, TReader, TId>, Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> many)
     {
-        oneToManies.Add(many(new HasManyFrom<TEntity, TReader, TId>(identitySelector)));
+        oneToManies.Add(many(new HasManyFrom<TEntity, TReader, TId>(
+            identitySelector,
+            entityShrinkers)));
         return this;
     }
 
@@ -154,7 +172,8 @@ where TEntity : class
             rejectedUpdates,
             rejectedDeletes,
             domainUpdates,
-            concurrencyScenarios);
+            concurrencyScenarios,
+            [.. entityShrinkers]);
 
     private PersistenceProperties<TReader, TEntity, TId> AddRejected<TException>(
         List<RejectedOperation<TEntity>> operations,

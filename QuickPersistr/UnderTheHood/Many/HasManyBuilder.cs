@@ -4,13 +4,17 @@ using QuickFuzzr;
 namespace QuickPersistr.UnderTheHood.Many;
 
 public class HasManyFrom<TEntity, TReader, TId>(
-    IdentitySelector<TEntity, TId> identitySelector)
+    IdentitySelector<TEntity, TId> identitySelector,
+    IReadOnlyList<Shrinker> entityShrinkers)
 where TEntity : class
 {
     public HasManyAdd<TEntity, TReader, TChild, TId> From<TChild>(
         Persistence<TReader, TChild> childPersistence)
     where TChild : class =>
-        new(new(identitySelector, childPersistence.Define().GetCreator<TChild>()));
+        new(new(
+            identitySelector,
+            childPersistence.Define().GetCreator<TChild>(),
+            entityShrinkers));
 }
 
 public class HasManyAdd<TEntity, TReader, TChild, TId>(

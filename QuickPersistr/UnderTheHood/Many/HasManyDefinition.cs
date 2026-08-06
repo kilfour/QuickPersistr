@@ -1,10 +1,12 @@
+using QuickCheckr;
 using QuickFuzzr;
 
 namespace QuickPersistr.UnderTheHood.Many;
 
 public record HasManyDefinition<TEntity, TReader, TChild, TId>(
     IdentitySelector<TEntity, TId> Identity,
-    FuzzrOf<TChild> ChildFuzzr)
+    FuzzrOf<TChild> ChildFuzzr,
+    IReadOnlyList<Shrinker> EntityShrinkers)
 where TEntity : class
 where TChild : class
 {

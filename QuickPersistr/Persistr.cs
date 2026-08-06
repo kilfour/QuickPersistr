@@ -79,8 +79,8 @@ public class PersisterRunner<TReader>(
                 {
                     FileAs = name,
                     Clerk = CourtClerk.Default().WithStackTrace(),
-                    WarningLevel = WarningLevel.None,
-                    ShrinkMode = a.ShrinkMode | ShrinkMode.Reduction
+                    WarningLevel = WarningLevel.Verbose,
+                    ShrinkMode = a.ShrinkMode | ShrinkMode.Reduction,
                 })),
             count.ExecutionsPerRun());
     }

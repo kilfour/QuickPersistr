@@ -7,6 +7,7 @@ namespace QuickPersistr.UnderTheHood;
 public sealed class RejectedOperationScenario<TReader, TEntity, TId>(
     IdentitySelector<TEntity, TId> identitySelector,
     IReadOnlyList<PropertyCheck<TEntity>> propertyChecks,
+    IReadOnlyList<Shrinker> entityShrinkers,
     IPersistenceScope<TReader> scope)
 where TEntity : class
 {
@@ -16,7 +17,10 @@ where TEntity : class
     public CheckrOf<Case> Create(
         RejectedOperation<TEntity> operation,
         FuzzrOf<TEntity> creator) =>
-        from entity in Checkr.Input("Rejected Entity", creator)
+        from entity in Checkr.Input(
+            "Rejected Entity",
+            creator,
+            [.. entityShrinkers])
         from rejected in Checkr.ActCarefully(
             $"Attempt Rejected Create {entityName}: {operation.Description}",
             () => AttemptCreate(operation, entity))

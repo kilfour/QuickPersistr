@@ -87,7 +87,10 @@ where TChild : class
     private CheckrOf<SourceForClear> Reassign(
         RemovedRelationship removed,
         Action<TEntity, TEntity, TChild> reassign) =>
-        from destination in Checkr.Input("Destination", EntityCreator)
+        from destination in Checkr.Input(
+            "Destination",
+            EntityCreator,
+            [.. definition.EntityShrinkers])
         from createDestination in Checkr.Act(
             $"Create Destination {entityName}",
             () =>

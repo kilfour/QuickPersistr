@@ -1,12 +1,13 @@
  ------------------------------------------------------------
  Test:                    Example
- Location:                IncorrectOwnedCollectionValueConversionTests.cs:62:1
+ Location:                IncorrectOwnedCollectionValueConversionTests.cs:68:1
  Original failing run:    2 executions
+ Minimal failing case:    2 executions (after 2 shrinks)
  Seed:                    1399221127
  ------------------------------------------------------------
   Executed: Create Course
    - Entity = Course-1
-   - Entity = { Name: { Value: "polvngyysxiyqujtdegbhbaohnjcgxyvbvftmknrwpxrwhncotdvxyioownzxvs" }, DateRange: { StartDate: 1.January(2026), EndDate: 25.January(2026) }, TimeRange: { StartTime: 4.Past(Mid.Day).Seconds(59, 96), EndTime: 13.Past(14).Seconds(52, 930) }, Days: [ { Day: Thursday, Mode: OnCampus }, { Day: Thursday, Mode: RemoteLearning }, { Day: Wednesday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: 63ec1457-e9bf-47c2-bbc7-b3e198d2c890 } }
+   - Entity = { Name: { Value: "polvngyysxiyqujtdegbhbaohnjcgxyvbvftmknrwpxrwhncotdvxyioownzxvs" }, DateRange: { StartDate: 1.January(2026), EndDate: 25.January(2026) }, TimeRange: { StartTime: 4.Past(Mid.Day).Seconds(59, 96), EndTime: 13.Past(14).Seconds(52, 930) }, Days: [ { Day: Wednesday, Mode: RemoteLearning } ] }
  ------------------------------------------------------------
   Executed: Read Course
    - Entity = Course-1
