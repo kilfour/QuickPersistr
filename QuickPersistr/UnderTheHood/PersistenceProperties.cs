@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using QuickCheckr;
 using QuickPersistr.UnderTheHood.Many;
+using QuickPersistr.UnderTheHood.One;
 
 namespace QuickPersistr.UnderTheHood;
 
@@ -28,6 +29,7 @@ where TEntity : class
         return this;
     }
 
+    private readonly List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToOnes = [];
     private readonly List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies = [];
     private readonly List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks = [];
     private readonly List<RejectedOperation<TEntity>> rejectedCreates = [];
@@ -151,6 +153,15 @@ where TEntity : class
         return this;
     }
 
+    public PersistenceProperties<TReader, TEntity, TId> HasOne(
+        Func<HasOneFrom<TEntity, TReader, TId>, Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> one)
+    {
+        oneToOnes.Add(one(new HasOneFrom<TEntity, TReader, TId>(
+            identitySelector,
+            entityShrinkers)));
+        return this;
+    }
+
     public PersistenceProperties<TReader, TEntity, TId> AfterDelete(
         string description,
         Func<IPersistenceReader<TReader>, TEntity, bool> check)
@@ -166,6 +177,7 @@ where TEntity : class
         => new(
             identitySelector,
             propertyChecks,
+            oneToOnes,
             oneToManies,
             afterDeleteChecks,
             rejectedCreates,

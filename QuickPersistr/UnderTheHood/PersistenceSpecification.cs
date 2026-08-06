@@ -7,6 +7,7 @@ namespace QuickPersistr.UnderTheHood;
 public class PersistenceSpecification<TReader, TEntity, TId>(
     IdentitySelector<TEntity, TId> identitySelector,
     List<PropertyCheck<TEntity>> propertyChecks,
+    List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToOnes,
     List<Func<IPersistenceScope<TReader>, PoolElement<TEntity>, CheckrOf<Case>>> oneToManies,
     List<AfterDeleteCheck<TReader, TEntity>> afterDeleteChecks,
     List<RejectedOperation<TEntity>> rejectedCreates,
@@ -23,6 +24,7 @@ where TEntity : class
 
     public int CheckrCount =>
         5 +
+        oneToOnes.Count +
         oneToManies.Count +
         rejectedCreates.Count +
         rejectedUpdates.Count +
@@ -39,6 +41,7 @@ where TEntity : class
             .. CruCheckrs(scope),
             .. DomainUpdateCheckrs(scope),
             .. OptimisticConcurrencyCheckrs(scope),
+            .. OneToOneCheckrs(scope),
             .. OneToManyCheckrs(scope),
             .. RejectedCreateCheckrs(scope),
             .. RejectedUpdateCheckrs(scope),
@@ -56,6 +59,11 @@ where TEntity : class
         [.. oneToManies.Select(a =>
             Trackr.OneOfPool<TEntity>("Entity", info
                 => a(scope,info)))];
+
+    private IList<CheckrOf<Case>> OneToOneCheckrs(IPersistenceScope<TReader> scope) =>
+        [.. oneToOnes.Select(a =>
+            Trackr.OneOfPool<TEntity>("Entity", info
+                => a(scope, info)))];
 
     private IList<CheckrOf<Case>> DeleteCheckr(IPersistenceScope<TReader> scope) => [
         Trackr.OneOfPool<TEntity>("Entity", info => DeleteCheckr(scope, info))];
