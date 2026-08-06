@@ -1,0 +1,41 @@
+name: .NET CI
+permissions:
+  contents: read
+  checks: write
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x 
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --logger "trx;LogFileName=test-results.trx"
+    - uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Tests
+        path: "**/*.trx"
+        reporter: dotnet-trx
+        list-suites: failed
+        list-tests: failed
+        max-annotations: 50
+    - name: Upload raw test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: trx-results
+        path: "**/*.trx"
+
+          

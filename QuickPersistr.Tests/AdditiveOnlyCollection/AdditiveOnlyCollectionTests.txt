@@ -1,0 +1,13 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Playlist: 1x
+ - Can Read Playlist.Id: 1x
+ - Can Read Playlist.Name: 1x
+ - Can Update Playlist.Name: 1x
+ - Playlist Can Add Track: 1x
+ - Can Delete Playlist: 1x
+ - Can Create Several Playlist: 1x
+ - Can Create Unique Playlist.Id: 1x
+ ------------------------------------------------------------

@@ -1,0 +1,1 @@
+dotnet test --logger "trx;LogFileName=quickcheckr.trx" --results-directory ./.test-results

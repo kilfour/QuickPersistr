@@ -34,11 +34,11 @@ public class Fuzz
             Fuzzr.One<CourseDay>().Many(1, 5).ToList());
 
     public readonly static FuzzrOf<Intent> TheDomain =
-        Configure
-            .This(Configr.Primitive(Fuzzr.Constant(true)))
-            .And(CourseNames)
-            .And(DateRanges)
-            .And(TimeRanges)
-            .And(CourseDays)
-            .And(Courses);
+        Configr.Combine(
+            Configr.Primitive(Fuzzr.Constant(true)),
+            CourseNames,
+            DateRanges,
+            TimeRanges,
+            CourseDays,
+            Courses);
 }
