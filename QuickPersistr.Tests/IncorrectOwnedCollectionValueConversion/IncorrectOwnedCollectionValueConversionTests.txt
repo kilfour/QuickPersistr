@@ -7,7 +7,7 @@
  ------------------------------------------------------------
   Executed: Create Course
    - Entity = Course-1
-   - Entity = { Name: { Value: "polvngyysxiyqujtdegbhbaohnjcgxyvbvftmknrwpxrwhncotdvxyioownzxvs" }, DateRange: { StartDate: 1.January(2026), EndDate: 25.January(2026) }, TimeRange: { StartTime: 4.Past(Mid.Day).Seconds(59, 96), EndTime: 13.Past(14).Seconds(52, 930) }, Days: [ { Day: Wednesday, Mode: RemoteLearning } ] }
+   - Entity = { Days: [ { Day: Wednesday, Mode: RemoteLearning } ] }
  ------------------------------------------------------------
   Executed: Read Course
    - Entity = Course-1

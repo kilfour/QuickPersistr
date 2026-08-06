@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using QuickCheckr;
 using QuickCheckr.Authoring.ThePress;
 using QuickCheckr.Authoring.ThePress.Printing;
+using QuickFuzzr;
 using QuickPersistr.Tests.Trickier;
 using QuickPersistr.Tests.Trickier.Model;
 using QuickPulse.Explains;
@@ -13,7 +14,7 @@ public class IncorrectOwnedCollectionValueConversionTests : PersistrTest<Incorre
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;
-    protected override bool Report => true;
+    protected override bool Report => false;
     protected override bool Explain => false;
 
     [Fact]
@@ -81,93 +82,28 @@ public class BrokenCoursePersistence : Persistence<BrokenCourseDbContext, Course
         Entity
             .PrimaryKey(course => course.Id)
             .Shrinking(
-                // Shrink.OnType<CourseName>(
-                //     collapse => collapse.Using(
-                //         Collapse.Member(
-                //             (CourseName courseName) => courseName.Value,
-                //             (courseName, value) => new CourseName(value)))),
-                Shrink.OnType<DateRange>(
-                    collapse => collapse.Using(
-                        Collapse.Member(
-                            (DateRange dateRange) => dateRange.StartDate,
-                            (dateRange, value) => new DateRange(value, dateRange.EndDate))
-                            ,
-                        Collapse.Member(
-                            (DateRange dateRange) => dateRange.EndDate,
-                            (dateRange, value) => new DateRange(dateRange.StartDate, value))
-                    )),
-                // Shrink.OnType<CourseName>(
-                //     collapse => collapse.Using(
-                //         Collapse.Member(
-                //             (CourseName courseName) => courseName.Value,
-                //             (course, value) => new CourseName(value)))),
+                Shrink.Fuzzr(Fuzzr.One<CourseName>()),
+                Shrink.Fuzzr(Fuzzr.One<DateRange>()),
+                Shrink.Fuzzr(Fuzzr.One<TimeRange>()),
                 Shrink.OnType<Course>(
                     collapse => collapse.Using(
                         Collapse.Member(
                             (Course course) => course.Name,
-                            (course, value) =>
-                                new Course(
-                                    value,
-                                    course.DateRange,
-                                    course.TimeRange,
-                                    course.Days)),
+                            (course, value) => new Course(value, course.DateRange, course.TimeRange, course.Days)),
                         Collapse.Member(
                             (Course course) => course.DateRange,
-                            (course, value) =>
-                                new Course(
-                                    course.Name,
-                                    value,
-                                    course.TimeRange,
-                                    course.Days)),
+                            (course, value) => new Course(course.Name, value, course.TimeRange, course.Days)),
                         Collapse.Member(
                             (Course course) => course.TimeRange,
-                            (course, value) =>
-                                new Course(
-                                    course.Name,
-                                    course.DateRange,
-                                    value,
-                                    course.Days)),
+                            (course, value) => new Course(course.Name, course.DateRange, value, course.Days)),
                         Collapse.Member(
                             (Course course) => course.Days,
-                            (course, value) =>
-                                new Course(
-                                    course.Name,
-                                    course.DateRange,
-                                    course.TimeRange,
-                                    [.. value.Select(day => new CourseDay(
-                                        CourseWeekDay.Monday,
-                                        day.Mode))]))
+                            (course, value) => new Course(course.Name, course.DateRange, course.TimeRange, [.. value.Select(day => new CourseDay(CourseWeekDay.Monday, day.Mode))]))
                     )))
             .Property(
                 course => course.Days,
                 (expected, actual) => expected.SequenceEqual(actual))
             .Persist();
-
-    private static readonly Shrinker CourseShrinker =
-        Shrink.OnType<Course>(
-            classify => classify.Classify(
-                Try.Function<Course>(CourseCandidates)),
-            reduce => reduce.Simplify(
-                Reduce.Function<Course>(CourseCandidates)));
-
-    private static IEnumerable<Course> CourseCandidates(Course course)
-    {
-        yield return new Course(
-            course.Name,
-            course.DateRange,
-            course.TimeRange,
-            [.. course.Days.Select(day => new CourseDay(
-                CourseWeekDay.Monday,
-                day.Mode))]);
-
-        yield return new Course(
-            course.Name,
-            course.DateRange,
-            course.TimeRange,
-            [.. course.Days.Select(day => new CourseDay(
-                CourseWeekDay.Monday,
-                LearningMode.OnCampus))]);
-    }
 }
 
 public class BrokenCourseScope()
