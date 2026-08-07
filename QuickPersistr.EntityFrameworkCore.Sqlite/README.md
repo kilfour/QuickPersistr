@@ -66,4 +66,4 @@ new SqlitePersistenceScope<LibraryDbContext>(
 
 SQLite is excellent for fast integration tests, but it does not reproduce every production provider's SQL, types, conversions, constraints, or concurrency semantics. If the production database is PostgreSQL, use `QuickPersistr.EntityFrameworkCore.PostgreSql` for contracts that depend on those details.
 
-This package supports EF Core 8.x and targets .NET 8. QuickPersistr is an early preview; APIs may change before version 1.0.
+This package supports EF Core 8.x and targets .NET 8. QuickPersistr is an early preview. APIs may change before version 1.0.

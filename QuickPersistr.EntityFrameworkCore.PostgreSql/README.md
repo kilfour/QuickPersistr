@@ -43,4 +43,4 @@ Generated database connections have pooling disabled so cleanup is deterministic
 
 If containers, migrations, or another fixture already manage database lifetime, use `QuickPersistr.EntityFrameworkCore.EfPersistenceScope<TDbContext>` instead.
 
-This package supports EF Core 8.x and Npgsql 8.x, and targets .NET 8. QuickPersistr is an early preview; APIs may change before version 1.0.
+This package supports EF Core 8.x and Npgsql 8.x, and targets .NET 8. QuickPersistr is an early preview. APIs may change before version 1.0.

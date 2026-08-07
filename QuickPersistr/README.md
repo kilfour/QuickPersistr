@@ -4,7 +4,7 @@ Property-based persistence testing for .NET.
 
 QuickPersistr generates entities and sequences of create, read, update, and delete operations, then checks the persisted result through fresh sessions. Failed runs are shrunk to a small reproducible case and include a seed for replay.
 
-> This package contains the engine and persistence contracts. EF Core users normally install one of the provider packages instead; it brings this package in transitively.
+> This package contains the engine and persistence contracts. EF Core users normally install one of the provider packages instead. This brings this package in transitively.
 
 ## Choose a package
 

@@ -1,9 +1,9 @@
-# QuickPersistr
+# <img src='icon.png' width='40' align='top'/> QuickPersistr
 > **Look out, honey, 'cause I'm using technology**
 
 Property-based persistence testing for .NET.
 
-[![Docs](https://img.shields.io/badge/docs-QuickCheckr-blue?style=flat-square&logo=readthedocs)](https://github.com/kilfour/QuickCheckr/blob/main/Docs/A_Guide/Guide.md)
+[![NuGet](https://img.shields.io/nuget/v/QuickPersistr.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/QuickPersistr)
 [![CI](https://img.shields.io/github/actions/workflow/status/kilfour/QuickPersistr/ci.yml?branch=main&style=flat-square&label=build)](https://github.com/kilfour/QuickPersistr/actions/workflows/ci.yml)
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-success?style=flat-square)](https://github.com/kilfour/QuickPersistr/blob/main/LICENSE)

@@ -41,4 +41,4 @@ The scope:
 
 The context factory must always connect to the same isolated test database for the lifetime of the scope. The scope does not own external connections, containers, servers, or database cleanup. Pass `ensureCreated: false` when schema creation is handled by migrations or test infrastructure.
 
-This package supports EF Core 8.x and targets .NET 8. QuickPersistr is an early preview; APIs may change before version 1.0.
+This package supports EF Core 8.x and targets .NET 8. QuickPersistr is an early preview. APIs may change before version 1.0.
