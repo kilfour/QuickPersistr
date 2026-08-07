@@ -85,7 +85,7 @@ public class TrackPersistence : Persistence<PlaylistDbContext, Track>
 }
 
 public class PlaylistScope()
-    : EfPersistenceScope<PlaylistDbContext>(options => new PlaylistDbContext(options));
+    : SqlitePersistenceScope<PlaylistDbContext>(options => new PlaylistDbContext(options));
 
 public class PlaylistDbContext(DbContextOptions<PlaylistDbContext> options)
     : DbContext(options)

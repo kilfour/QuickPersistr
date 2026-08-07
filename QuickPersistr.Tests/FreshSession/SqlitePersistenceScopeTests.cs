@@ -2,12 +2,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuickPersistr.Tests.FreshSession;
 
-public class EfPersistenceScopeTests
+public class SqlitePersistenceScopeTests
 {
     [Fact]
     public void StartsANewSessionWithoutLosingPersistedState()
     {
-        using var scope = new EfPersistenceScope<FreshSessionDbContext>(
+        using var scope = new SqlitePersistenceScope<FreshSessionDbContext>(
             options => new FreshSessionDbContext(options));
         var entity = scope.Add(new FreshSessionEntity { Name = "Persisted" });
         scope.Commit();

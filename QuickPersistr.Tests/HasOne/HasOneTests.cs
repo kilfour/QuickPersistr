@@ -117,7 +117,7 @@ public class PassportPersistence : Persistence<HasOneDbContext, Passport>
 }
 
 public class HasOneScope()
-    : EfPersistenceScope<HasOneDbContext>(options => new HasOneDbContext(options));
+    : SqlitePersistenceScope<HasOneDbContext>(options => new HasOneDbContext(options));
 
 public class HasOneDbContext(DbContextOptions<HasOneDbContext> options)
     : DbContext(options)

@@ -115,7 +115,7 @@ public class MemberPersistence : Persistence<IgnoredReassignmentDbContext, Membe
 }
 
 public class IgnoredReassignmentScope()
-    : EfPersistenceScope<IgnoredReassignmentDbContext>(
+    : SqlitePersistenceScope<IgnoredReassignmentDbContext>(
         options => new IgnoredReassignmentDbContext(options));
 
 public class IgnoredReassignmentDbContext(

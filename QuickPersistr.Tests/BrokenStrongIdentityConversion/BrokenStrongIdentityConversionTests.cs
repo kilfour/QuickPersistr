@@ -72,7 +72,7 @@ public class ThingamajigPersistence : Persistence<BrokenIdentityDbContext, Thing
 }
 
 public class BrokenIdentityScope()
-    : EfPersistenceScope<BrokenIdentityDbContext>(options => new BrokenIdentityDbContext(options));
+    : SqlitePersistenceScope<BrokenIdentityDbContext>(options => new BrokenIdentityDbContext(options));
 
 public class BrokenIdentityDbContext(DbContextOptions<BrokenIdentityDbContext> options)
     : DbContext(options)

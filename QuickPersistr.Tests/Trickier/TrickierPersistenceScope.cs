@@ -1,6 +1,6 @@
 namespace QuickPersistr.Tests.Trickier;
 
-public class TrickierPersistenceScope : EfPersistenceScope<TrickierDbContext>
+public class TrickierPersistenceScope : SqlitePersistenceScope<TrickierDbContext>
 {
     public TrickierPersistenceScope() : base(a => new TrickierDbContext(a)) { }
 }

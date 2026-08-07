@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,27 +7,18 @@
 
     <Version>0.0.1</Version>
     <Authors>Kilfour</Authors>
-
-    <PackageId>QuickPersistr</PackageId>
-    <Title>QuickPersistr</Title>
-    <Description>Property-based persistence testing for .NET.</Description>
-    <PackageTags>property-based-testing;persistence;testing;database;QuickCheckr</PackageTags>
-
+    <PackageId>QuickPersistr.EntityFrameworkCore.PostgreSql</PackageId>
+    <Title>QuickPersistr adapter for EF Core PostgreSQL</Title>
+    <Description>Isolated temporary PostgreSQL database scope for QuickPersistr and Entity Framework Core.</Description>
+    <PackageTags>property-based-testing;persistence;testing;database;entity-framework-core;postgresql;npgsql</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/kilfour/QuickPersistr</RepositoryUrl>
-    <RepositoryBranch>main</RepositoryBranch>
     <PackageProjectUrl>https://github.com/kilfour/QuickPersistr</PackageProjectUrl>
-
-    <!-- NuGet metadata -->
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>icon.png</PackageIcon>
-
-    <!-- Docs -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
-
-    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,11 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="QuickCheckr" Version="0.2.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- <ProjectReference Include="..\..\QuickCheckr\QuickCheckr\QuickCheckr.csproj" /> -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="[8.0.10,9.0.0)" />
+    <ProjectReference Include="..\QuickPersistr.EntityFrameworkCore\QuickPersistr.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

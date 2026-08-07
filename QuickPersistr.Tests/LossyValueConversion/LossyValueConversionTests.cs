@@ -80,7 +80,7 @@ public class AuditEntryPersistence : Persistence<AuditDbContext, AuditEntry>
 }
 
 public class AuditScope()
-    : EfPersistenceScope<AuditDbContext>(options => new AuditDbContext(options));
+    : SqlitePersistenceScope<AuditDbContext>(options => new AuditDbContext(options));
 
 public class AuditDbContext(DbContextOptions<AuditDbContext> options)
     : DbContext(options)

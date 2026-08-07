@@ -68,7 +68,7 @@ public class PublicationPersistence : Persistence<PublicationDbContext, Publicat
 }
 
 public class PublicationScope()
-    : EfPersistenceScope<PublicationDbContext>(options => new PublicationDbContext(options));
+    : SqlitePersistenceScope<PublicationDbContext>(options => new PublicationDbContext(options));
 
 public class PublicationDbContext(DbContextOptions<PublicationDbContext> options)
     : DbContext(options)

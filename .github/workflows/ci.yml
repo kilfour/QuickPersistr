@@ -22,6 +22,8 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --logger "trx;LogFileName=test-results.trx"
+    - name: Test NuGet packages
+      run: pwsh ./Scripts/test-packages.ps1
     - uses: dorny/test-reporter@v2
       if: always()
       with:

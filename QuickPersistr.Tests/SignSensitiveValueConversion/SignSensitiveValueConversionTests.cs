@@ -77,7 +77,7 @@ public class LedgerEntryPersistence : Persistence<LedgerDbContext, LedgerEntry>
 }
 
 public class LedgerScope()
-    : EfPersistenceScope<LedgerDbContext>(options => new LedgerDbContext(options));
+    : SqlitePersistenceScope<LedgerDbContext>(options => new LedgerDbContext(options));
 
 public class LedgerDbContext(DbContextOptions<LedgerDbContext> options)
     : DbContext(options)

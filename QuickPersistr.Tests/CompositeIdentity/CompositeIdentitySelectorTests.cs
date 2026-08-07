@@ -68,7 +68,7 @@ public class CatalogItemPersistence : Persistence<CatalogDbContext, CatalogItem>
 }
 
 public class CatalogScope()
-    : EfPersistenceScope<CatalogDbContext>(options => new CatalogDbContext(options));
+    : SqlitePersistenceScope<CatalogDbContext>(options => new CatalogDbContext(options));
 
 public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     : DbContext(options)

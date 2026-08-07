@@ -2,7 +2,7 @@ using QuickPersistr.Tests.BackToSchool.Model;
 
 namespace QuickPersistr.Tests.BackToSchool;
 
-public class BackToSchoolPersistenceScope : EfPersistenceScope<BackToSchoolDbContext>
+public class BackToSchoolPersistenceScope : SqlitePersistenceScope<BackToSchoolDbContext>
 {
     public BackToSchoolPersistenceScope() : base(a => new BackToSchoolDbContext(a)) { }
 }

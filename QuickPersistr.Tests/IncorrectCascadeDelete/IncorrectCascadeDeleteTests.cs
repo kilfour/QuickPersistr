@@ -87,7 +87,7 @@ public class BlogPersistence : Persistence<IncorrectCascadeDbContext, Blog>
 }
 
 public class IncorrectCascadeScope()
-    : EfPersistenceScope<IncorrectCascadeDbContext>(options => new IncorrectCascadeDbContext(options));
+    : SqlitePersistenceScope<IncorrectCascadeDbContext>(options => new IncorrectCascadeDbContext(options));
 
 public class IncorrectCascadeDbContext(DbContextOptions<IncorrectCascadeDbContext> options)
     : DbContext(options)

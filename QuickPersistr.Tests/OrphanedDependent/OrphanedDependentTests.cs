@@ -90,7 +90,7 @@ public class BlogPersistence : Persistence<OrphaningDbContext, Blog>
 }
 
 public class OrphaningScope()
-    : EfPersistenceScope<OrphaningDbContext>(
+    : SqlitePersistenceScope<OrphaningDbContext>(
         options => new OrphaningDbContext(options),
         enforceForeignKeys: false);
 

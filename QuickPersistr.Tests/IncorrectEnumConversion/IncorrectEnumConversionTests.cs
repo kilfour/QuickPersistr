@@ -88,7 +88,7 @@ public class PaymentPersistence : Persistence<PaymentsDbContext, Payment>
 }
 
 public class PaymentsScope()
-    : EfPersistenceScope<PaymentsDbContext>(options => new PaymentsDbContext(options));
+    : SqlitePersistenceScope<PaymentsDbContext>(options => new PaymentsDbContext(options));
 
 public class PaymentsDbContext(DbContextOptions<PaymentsDbContext> options)
     : DbContext(options)

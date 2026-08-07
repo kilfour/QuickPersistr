@@ -21,7 +21,7 @@ public class A_ASimpleEntity : PersistrTest<A_ASimpleEntity>
     [CodeRemove(".StoreCaseFiles(TheJournalist)")]
     protected override void GetPersistr(Journalist journalist) =>
         Persistr.Named("A Simple Entity")
-            .Scope(() => new EfPersistenceScope<Library>(a => new Library(a)))
+            .Scope(() => new SqlitePersistenceScope<Library>(a => new Library(a)))
             .Entities(new BookPersistence()).StoreCaseFiles(journalist)
             .Run(1383231788);
 

@@ -86,17 +86,17 @@ public class BrokenCoursePersistence : Persistence<BrokenCourseDbContext, Course
                 Shrink.Fuzzr(Fuzzr.One<DateRange>()),
                 Shrink.Fuzzr(Fuzzr.One<TimeRange>()),
                 Shrink.OnType<Course>(
-                    collapse => collapse.Using(
-                        Collapse.Member(
+                    traverse => traverse.Using(
+                        Traversal.Member(
                             (Course course) => course.Name,
                             (course, value) => new Course(value, course.DateRange, course.TimeRange, course.Days)),
-                        Collapse.Member(
+                        Traversal.Member(
                             (Course course) => course.DateRange,
                             (course, value) => new Course(course.Name, value, course.TimeRange, course.Days)),
-                        Collapse.Member(
+                        Traversal.Member(
                             (Course course) => course.TimeRange,
                             (course, value) => new Course(course.Name, course.DateRange, value, course.Days)),
-                        Collapse.Member(
+                        Traversal.Member(
                             (Course course) => course.Days,
                             (course, value) => new Course(course.Name, course.DateRange, course.TimeRange, [.. value.Select(day => new CourseDay(CourseWeekDay.Monday, day.Mode))]))
                     )))
@@ -107,7 +107,7 @@ public class BrokenCoursePersistence : Persistence<BrokenCourseDbContext, Course
 }
 
 public class BrokenCourseScope()
-    : EfPersistenceScope<BrokenCourseDbContext>(options => new BrokenCourseDbContext(options));
+    : SqlitePersistenceScope<BrokenCourseDbContext>(options => new BrokenCourseDbContext(options));
 
 public class BrokenCourseDbContext(DbContextOptions<BrokenCourseDbContext> options)
     : DbContext(options)

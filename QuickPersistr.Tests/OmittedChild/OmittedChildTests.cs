@@ -89,7 +89,7 @@ public class StudentPersistence : Persistence<OmittedChildDbContext, Student>
 }
 
 public class OmittedChildScope()
-    : EfPersistenceScope<OmittedChildDbContext>(options => new OmittedChildDbContext(options));
+    : SqlitePersistenceScope<OmittedChildDbContext>(options => new OmittedChildDbContext(options));
 
 public class OmittedChildDbContext(DbContextOptions<OmittedChildDbContext> options)
     : DbContext(options)

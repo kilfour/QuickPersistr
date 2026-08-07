@@ -91,7 +91,7 @@ public class DocumentPersistence : Persistence<DocumentDbContext, Document>
 }
 
 public class DocumentScope()
-    : EfPersistenceScope<DocumentDbContext>(options => new DocumentDbContext(options));
+    : SqlitePersistenceScope<DocumentDbContext>(options => new DocumentDbContext(options));
 
 public class DocumentDbContext(DbContextOptions<DocumentDbContext> options)
     : DbContext(options)

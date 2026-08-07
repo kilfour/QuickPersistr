@@ -73,7 +73,7 @@ public class PostPersistence : Persistence<PostDbContext, Post>
 }
 
 public class PostScope()
-    : EfPersistenceScope<PostDbContext>(options => new PostDbContext(options));
+    : SqlitePersistenceScope<PostDbContext>(options => new PostDbContext(options));
 
 public class PostDbContext(DbContextOptions<PostDbContext> options)
     : DbContext(options)
