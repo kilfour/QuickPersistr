@@ -10,6 +10,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: quickpersistr
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -24,6 +36,8 @@ jobs:
       run: dotnet test --logger "trx;LogFileName=test-results.trx"
     - name: Test NuGet packages
       run: pwsh ./Scripts/test-packages.ps1
+      env:
+        QUICKPERSISTR_POSTGRES: Host=127.0.0.1;Port=5432;Database=postgres;Username=postgres;Password=quickpersistr
     - uses: dorny/test-reporter@v2
       if: always()
       with:
