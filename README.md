@@ -16,7 +16,29 @@ When a generated scenario fails, the underlying [QuickCheckr](https://github.com
 
 > QuickPersistr tests what your persistence layer *does*, not what its configuration claims it will do.
 
-## Example
+> [!IMPORTANT]
+> QuickPersistr is an early preview. Until version 1.0, the public API and package structure may change between releases.
+
+## Installation
+
+Most EF Core users only need one provider package; it brings in the engine and shared EF adapter transitively.
+
+| Package | Use it for |
+| --- | --- |
+| `QuickPersistr.EntityFrameworkCore.Sqlite` | Fast, isolated tests backed by in-memory SQLite |
+| `QuickPersistr.EntityFrameworkCore.PostgreSql` | Tests against the behavior of a real PostgreSQL server |
+| `QuickPersistr.EntityFrameworkCore` | EF Core when database creation and lifetime are managed externally |
+| `QuickPersistr` | A custom adapter for another persistence technology |
+
+For the quickest start:
+
+```bash
+dotnet add package QuickPersistr.EntityFrameworkCore.Sqlite --version 0.0.1
+```
+
+The EF adapters currently target .NET 8 and support EF Core 8.x.
+
+## Quick start
 
 Suppose an EF Core mapping silently ignores changes to `Book.Description`:
 
@@ -45,11 +67,16 @@ Then provide a persistence scope and run it:
 ```csharp
 using QuickPersistr.EntityFrameworkCore.Sqlite;
 
-Persistr.Named("Books")
-    .Scope(() => new SqlitePersistenceScope<LibraryDbContext>(
-        options => new LibraryDbContext(options)))
-    .Entities(new BookPersistence())
-    .Run();
+public class BookPersistenceTests
+{
+    [Fact]
+    public void Mapping_matches_the_contract() =>
+        Persistr.Named("Books")
+            .Scope(() => new SqlitePersistenceScope<LibraryDbContext>(
+                options => new LibraryDbContext(options)))
+            .Entities(new BookPersistence())
+            .Run();
+}
 ```
 
 QuickPersistr creates varied `Book` instances, exercises the mapping, and reports the persistence contract that was broken:
@@ -72,7 +99,7 @@ Minimal failing case:    2 executions (after 9 shrinks)
 ======================================================
 ```
 
-The generated values will vary. Failed runs include a seed, so the same case can be replayed with `.Run(seed)`.
+The generated values will vary. Failed runs include a seed, so the same case can be replayed with `.Run(seed)`. See the [SQLite package quick start](https://github.com/kilfour/QuickPersistr/blob/main/QuickPersistr.EntityFrameworkCore.Sqlite/README.md) for a complete model, context, specification, and test.
 
 ## What it checks
 
@@ -144,6 +171,8 @@ The connection string identifies the server and maintenance database. Its user m
 
 The current adapter packages support EF Core 8. Their EF/provider dependency ranges are bounded below EF Core 9, so choosing an adapter does not add EF to the main `QuickPersistr` package.
 
+SQLite is useful for fast feedback, but it cannot prove provider-specific SQL, type mappings, conversions, constraints, or concurrency behavior. Use the adapter for your production provider when those details belong to the persistence contract.
+
 ## Defining richer contracts
 
 The fluent specification grows with the persistence behaviour you care about:
@@ -173,17 +202,9 @@ Entity
 
 Only declare properties and behaviours that belong to the persistence contract. Navigation properties that are configured separately can be excluded from automatic generation with `DomainConfiguration(...)` and then exercised explicitly through `HasOne` or `HasMany`.
 
-## Status and installation
+## Development
 
-QuickPersistr is currently in early development and is not yet published as a NuGet package. It targets .NET 8. To try it from source, clone this repository alongside [QuickCheckr](https://github.com/kilfour/QuickCheckr); the current project reference expects both repositories to share the same parent directory.
-
-```text
-Code/
-├── QuickCheckr/
-└── QuickPersistr/
-```
-
-Then build and run the executable examples:
+Build and run the executable examples:
 
 ```bash
 dotnet build QuickPersistr.sln
