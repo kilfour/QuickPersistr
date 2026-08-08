@@ -105,7 +105,7 @@ where TChild : class
             () => definition.Reload(scope.Reader, set.SourceId))
         select new ReplacedRelationship(
             set.SourceId,
-            new[] { set.Child, replacement },
+            set.Child,
             replacement,
             current,
             set.Nested,
@@ -120,7 +120,7 @@ where TChild : class
         from childContract in contractEligible
             ? definition.ChildSpecification.GetNestedDeleteCheckr(
                 scope,
-                replaced.Active,
+                replaced.Released,
                 child => definition.Set(
                     definition.Reload(scope.Reader, replaced.SourceId),
                     child),
@@ -248,7 +248,7 @@ where TChild : class
 
     private record ReplacedRelationship(
         TId SourceId,
-        IReadOnlyList<TChild> Created,
+        TChild Released,
         TChild Active,
         TEntity Source,
         bool Nested,
