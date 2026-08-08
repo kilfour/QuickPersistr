@@ -9,7 +9,7 @@ public class AdditiveOnlyCollectionTests : PersistrTest<AdditiveOnlyCollectionTe
 {
     protected override bool Asserts => false;
     protected override bool PassedExpectationsContains => false;
-    protected override bool Report => true;
+    protected override bool Report => false;
     protected override bool Explain => false;
 
     [Fact]

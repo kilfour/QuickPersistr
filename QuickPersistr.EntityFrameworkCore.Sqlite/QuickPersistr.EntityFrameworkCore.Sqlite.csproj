@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>Kilfour</Authors>
     <PackageId>QuickPersistr.EntityFrameworkCore.Sqlite</PackageId>
     <Title>QuickPersistr adapter for EF Core SQLite</Title>

@@ -249,6 +249,14 @@ To verify the distributable artifacts rather than project references, run the pa
 ./Scripts/test-packages.ps1
 ```
 
+To test and create the release packages under `artifacts/packages/<version>`:
+
+```powershell
+./Scripts/package.ps1
+```
+
+Add `-Publish` to push the packages to NuGet. The script reads `NUGET_API_KEY` from the process environment, falling back to the ignored repository `.env` file, and uses `--skip-duplicate` when publishing. Use `-SkipTests` only when the test suite has already passed.
+
 ## Dependencies
 
 - [QuickCheckr](https://github.com/kilfour/QuickCheckr): stateful property-based testing, behavioural shrinking, and failure reports.
