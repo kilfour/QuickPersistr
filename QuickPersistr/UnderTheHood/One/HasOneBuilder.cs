@@ -1,5 +1,4 @@
 using QuickCheckr;
-using QuickFuzzr;
 
 namespace QuickPersistr.UnderTheHood.One;
 

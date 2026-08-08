@@ -1,0 +1,22 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Talk: 1x
+ - Can Read Talk.Id: 1x
+ - Can Read Talk.Subject: 1x
+ - Can Update Talk.Subject: 1x
+ - Talk Can Set Speaker: 1x
+ - Talk Can Replace Speaker: 1x
+ - Talk Releases Previous Speaker: 1x
+ - Can Create Speaker: 1x
+ - Can Create Several Speaker: 1x
+ - Can Create Unique Speaker.Id: 1x
+ - Can Read Speaker.Id: 1x
+ - Can Read Speaker.Name: 1x
+ - Can Update Speaker.Name: 1x
+ - Can Delete Speaker: 1x
+ - Can Delete Talk: 1x
+ - Can Create Several Talk: 1x
+ - Can Create Unique Talk.Id: 1x
+ ------------------------------------------------------------
