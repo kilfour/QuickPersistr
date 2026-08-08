@@ -7,6 +7,13 @@
  - Can Read Playlist.Name: 1x
  - Can Update Playlist.Name: 1x
  - Playlist Can Add Track: 1x
+ - Can Create Track: 1x
+ - Can Create Several Track: 1x
+ - Can Create Unique Track.Id: 1x
+ - Can Read Track.Id: 1x
+ - Can Read Track.Name: 1x
+ - Can Update Track.Name: 1x
+ - Can Delete Track: 1x
  - Can Delete Playlist: 1x
  - Can Create Several Playlist: 1x
  - Can Create Unique Playlist.Id: 1x

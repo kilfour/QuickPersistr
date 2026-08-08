@@ -26,6 +26,10 @@ public interface IPersistenceReader<TReader>
 
 The complete contracts are in [`IPersistenceScope.cs`](https://github.com/kilfour/QuickPersistr/blob/main/QuickPersistr/IPersistenceScope.cs) and [`IPersistenceReader.cs`](https://github.com/kilfour/QuickPersistr/blob/main/QuickPersistr/IPersistenceReader.cs).
 
+## Aggregate roots and dependents
+
+Specifications registered with `.Entities(...)` are independently persisted roots. A child specification supplied through `.From(...)` in a `HasOne` or `HasMany` contract is instead exercised through its parent, so required foreign keys are valid. QuickPersistr runs its full configured contract: generated and unique identities, property reads and updates, domain updates, optimistic concurrency, nested relationships, rejected operations, deletion, and post-delete expectations. Generated child updates leave relationship-owned foreign keys untouched, and rejected creates attach through the parent before commit. Register the child separately only when it can also be validly persisted without its parent.
+
 ## Replaying a failure
 
 Every failed run reports its seed. Pass that seed to `Run` to reproduce the same generated scenario:

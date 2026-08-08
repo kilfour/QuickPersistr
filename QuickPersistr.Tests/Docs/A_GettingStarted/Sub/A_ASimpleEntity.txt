@@ -7,9 +7,11 @@
  ------------------------------------------------------------
   Executed: Create Book
    - Entity = Book-1
+   - WARNING: All inputs were considered irrelevant.
  ------------------------------------------------------------
   Executed: Update Book
    - Entity = Book-1
+   - WARNING: All inputs were considered irrelevant.
  ======================================================
   !! Expectation Failed: Can Update Book.Description
        Expected: "dzrqiz"

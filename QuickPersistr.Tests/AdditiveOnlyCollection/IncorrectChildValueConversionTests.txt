@@ -1,0 +1,37 @@
+ ------------------------------------------------------------
+ Test:                    Example
+ Location:                IncorrectChildValueConversionTests.cs:56:1
+ Original failing run:    4 executions
+ Seed:                    2092967570
+ ------------------------------------------------------------
+  Executed: Create Shelf
+   - Entity = Shelf-1
+   - Entity = { Id: 1 }
+ ------------------------------------------------------------
+  Executed: Read Shelf
+   - Entity = Shelf-1
+ ------------------------------------------------------------
+  Executed: Update Shelf
+   - Entity         = Shelf-1
+   - Updated Entity = { Id: 1 }
+ ------------------------------------------------------------
+  Executed: Add Children, Shelf.HasMany[0]: Delete Volume, Shelf.HasMany[0]: Prepare Volume For Delete, Shelf.HasMany[0]: Read Volume, Shelf.HasMany[0]: Update Volume
+   - Entity                          = Shelf-1
+   - Children                        = [ { Id: 1, ShelfId: 1 }, { Id: 2, ShelfId: 1 } ]
+   - Shelf.HasMany[0]: Updated Child = { Id: 1, ShelfId: 1 }
+ ==================================================
+  !! Expectation Failed: Can Read Volume.Binding
+       Expected: Hardcover
+       Actual:   Paperback
+ ==================================================
+ Passed Expectations
+ - Can Create Shelf: 1x
+ - Can Read Shelf.Id: 1x
+ - Shelf Can Add Volume: 1x
+ - Can Create Volume: 1x
+ - Can Create Several Volume: 1x
+ - Can Create Unique Volume.Id: 1x
+ - Can Read Volume.Id: 1x
+ - Can Update Volume.Binding: 1x
+ - Can Delete Volume: 1x
+ ------------------------------------------------------------

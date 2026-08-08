@@ -7,6 +7,7 @@
  ------------------------------------------------------------
   Executed: Create Blog
    - Entity = Blog-1
+   - WARNING: All inputs were considered irrelevant.
  ------------------------------------------------------------
   Executed: Delete Blog
    - Entity = Blog-1

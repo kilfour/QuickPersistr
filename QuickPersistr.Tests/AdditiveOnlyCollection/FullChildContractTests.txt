@@ -1,0 +1,49 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Catalog: 1x
+ - Can Read Catalog.Id: 1x
+ - Catalog Can Add Item: 1x
+ - Can Create Item: 1x
+ - Can Create Several Item: 1x
+ - Can Create Unique Item.Id: 1x
+ - Can Read Item.Id: 1x
+ - Can Read Item.Name: 1x
+ - Can Read Item.Version: 1x
+ - Can Update Item.Name: 1x
+ - Can Update Item.Version: 1x
+ - Rename Preserves Item.Id: 1x
+ - Rename Persists Item.Name: 1x
+ - Rename Persists Item.Version: 1x
+ - Rejects Stale Item Update: Publish / Archive: 1x
+ - Concurrent Publish / Archive Preserves Item.Id: 1x
+ - Concurrent Publish / Archive Persists Winner Item.Name: 1x
+ - Concurrent Publish / Archive Persists Winner Item.Version: 1x
+ - Item Can Add Note: 1x
+ - Can Create Note: 1x
+ - Can Create Several Note: 1x
+ - Can Create Unique Note.Id: 1x
+ - Can Read Note.Id: 1x
+ - Can Read Note.Text: 1x
+ - Can Update Note.Text: 1x
+ - Item Can Remove Note: 1x
+ - Item Retains Other Note: 1x
+ - Item Can Clear Note: 1x
+ - Can Delete Note: 1x
+ - Rejects Creating Item: invalid item: 1x
+ - Rejected Create Leaves Item Absent: 1x
+ - Rejects Updating Item: invalid change: 1x
+ - Rejected Update Preserves Item.Id: 1x
+ - Rejected Update Preserves Item.Name: 1x
+ - Rejected Update Preserves Item.Version: 1x
+ - Rejects Deleting Item: protected item: 1x
+ - Rejected Delete Preserves Item.Id: 1x
+ - Rejected Delete Preserves Item.Name: 1x
+ - Rejected Delete Preserves Item.Version: 1x
+ - Can Delete Item: 1x
+ - Deleting Item leaves it absent: 1x
+ - Can Delete Catalog: 1x
+ - Can Create Several Catalog: 1x
+ - Can Create Unique Catalog.Id: 1x
+ ------------------------------------------------------------

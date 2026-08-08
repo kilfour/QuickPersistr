@@ -38,10 +38,10 @@ public class IgnoredRelationshipReassignmentTests : PersistrTest<IgnoredRelation
             article.FailingExpectationMessages()[1]);
         Assert.Equal("", article.VerifyFailed());
         Assert.Equal(4, article.Total().Executions());
-        Assert.Equal(8, article.Total().Actions());
+        Assert.Equal(10, article.Total().Actions());
         Assert.Equal(3, article.Total().Inputs());
         Assert.Equal(4, article.Total().PoolTraces());
-        Assert.Equal(7, article.Total().PassedExpectations());
+        Assert.Equal(13, article.Total().PassedExpectations());
         Assert.Equal(1, article.Execution(1).Read().ExecutionId);
         Assert.Equal("Create Team", article.Execution(1).Action(1).Read().Label);
         Assert.Equal("Entity", article.Execution(1).Input(1).Read().Label);
@@ -54,12 +54,18 @@ public class IgnoredRelationshipReassignmentTests : PersistrTest<IgnoredRelation
         Assert.Equal("Can Create Team", article.PassedExpectation(1).Read().Label);
         Assert.Equal("Can Read Team.Id", article.PassedExpectation(2).Read().Label);
         Assert.Equal("Team Can Add Member", article.PassedExpectation(3).Read().Label);
-        Assert.Equal("Team Can Remove Member", article.PassedExpectation(4).Read().Label);
-        Assert.Equal("Team Retains Other Member", article.PassedExpectation(5).Read().Label);
-        Assert.Equal("Source Team Retains Other Member", article.PassedExpectation(6).Read().Label);
-        Assert.Equal("Team Can Clear Member", article.PassedExpectation(7).Read().Label);
+        Assert.Equal("Can Create Member", article.PassedExpectation(4).Read().Label);
+        Assert.Equal("Can Create Several Member", article.PassedExpectation(5).Read().Label);
+        Assert.Equal("Can Create Unique Member.Id", article.PassedExpectation(6).Read().Label);
+        Assert.Equal("Can Read Member.Id", article.PassedExpectation(7).Read().Label);
+        Assert.Equal("Can Read Member.Name", article.PassedExpectation(8).Read().Label);
+        Assert.Equal("Can Update Member.Name", article.PassedExpectation(9).Read().Label);
+        Assert.Equal("Team Can Remove Member", article.PassedExpectation(10).Read().Label);
+        Assert.Equal("Team Retains Other Member", article.PassedExpectation(11).Read().Label);
+        Assert.Equal("Source Team Retains Other Member", article.PassedExpectation(12).Read().Label);
+        Assert.Equal("Team Can Clear Member", article.PassedExpectation(13).Read().Label);
         Assert.All(
-            Enumerable.Range(1, 7),
+            Enumerable.Range(1, 13),
             index => Assert.Equal(1, article.PassedExpectation(index).Read().TimesPassed));
     }
 }

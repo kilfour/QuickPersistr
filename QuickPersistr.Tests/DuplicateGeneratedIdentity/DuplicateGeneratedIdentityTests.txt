@@ -7,6 +7,8 @@
  ------------------------------------------------------------
   Executed: Create Several Thingamajig
    - Entities = [ { Id: { Value: 42 } }, { Id: { Value: 42 } } ]
+   - WARNING: Can't shrink type 'ThingamajigId' at input 'Entities.0.Id'.
+   - WARNING: Can't shrink type 'ThingamajigId' at input 'Entities.1.Id'.
  ===========================================================
   !! Expectation Failed: Can Create Unique Thingamajig.Id
        Expected: 2 distinct Thingamajig.Id values

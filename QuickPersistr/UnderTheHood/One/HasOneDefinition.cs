@@ -5,11 +5,13 @@ namespace QuickPersistr.UnderTheHood.One;
 
 public record HasOneDefinition<TEntity, TReader, TChild, TId>(
     IdentitySelector<TEntity, TId> Identity,
-    FuzzrOf<TChild> ChildFuzzr,
-    IReadOnlyList<Shrinker> EntityShrinkers)
+    IPersistenceSpecification<TReader> ChildSpecification,
+    IReadOnlyList<Shrinker> EntityShrinkers,
+    string RelationshipKey)
 where TEntity : class
 where TChild : class
 {
+    public FuzzrOf<TChild> ChildFuzzr => ChildSpecification.GetCreator<TChild>();
     public Action<TEntity, TChild> Set { get; init; } = null!;
     public Action<TEntity>? Clear { get; init; }
     public Action<TEntity, TEntity, TChild>? Reassign { get; init; }

@@ -1,3 +1,7 @@
+### 0.0.2: Let the Children Boogie
+
+* Child specifications supplied through `HasOne.From(...)` and `HasMany.From(...)` now run their complete configured contract through the parent: identity generation and uniqueness, property reads and updates, domain updates, optimistic concurrency, nested relationships, rejected operations, delete, and post-delete expectations. Parent-aware create attempts keep required foreign keys valid, and destructive child checks are ordered to preserve reproducible shrinking.
+
 ### 0.0.1: Should I Stay or Should I Go
 
 * Initial property-based persistence testing DSL, built on QuickCheckr and QuickFuzzr.

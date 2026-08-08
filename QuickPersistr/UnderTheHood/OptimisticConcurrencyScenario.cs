@@ -14,11 +14,25 @@ where TEntity : class
 
     public CheckrOf<Case> Check(
         OptimisticConcurrency<TEntity> scenario,
-        PoolElement<TEntity> element) =>
+        PoolElement<TEntity> element,
+        string? keyPrefix = null) =>
         from identity in Checkr.Capture(() => identitySelector.Select(element.Value))
         from attempt in Checkr.Act(
-            $"Update {entityName} Concurrently: {scenario.Description}",
+            Key(keyPrefix, $"Update {entityName} Concurrently: {scenario.Description}"),
             () => Execute(scenario, identity))
+        from verified in attempt is null
+            ? Checkr.Capture(() => Case.Closed)
+            : Verify(scenario, element, identity, attempt)
+        select Case.Closed;
+
+    private static string Key(string? prefix, string key) =>
+        prefix is null ? key : $"{prefix}: {key}";
+
+    private CheckrOf<Case> Verify(
+        OptimisticConcurrency<TEntity> scenario,
+        PoolElement<TEntity> element,
+        TId identity,
+        ConcurrentAttempt attempt) =>
         from conflict in scenario.ExpectConflict(
             $"Rejects Stale {entityName} Update: {scenario.Description}",
             attempt.Conflict)
@@ -40,7 +54,9 @@ where TEntity : class
                     report => [
                         $"Expected: {report.IntroduceThis(attempt.WinningProperties[index])}",
                         $"Actual:   {report.IntroduceThis(check.GetValue(reloaded))}"])))
-        from stored in element.Replace(reloaded)
+        from stored in element.Id < 0
+            ? Checkr.Capture(() => Case.Closed)
+            : element.Replace(reloaded)
         select Case.Closed;
 
     private ConcurrentAttempt Execute(

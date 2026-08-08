@@ -14,12 +14,13 @@ where TEntity : class
 
     public CheckrOf<Case> Check(
         DomainMutation<TEntity> mutation,
-        PoolElement<TEntity> element) =>
+        PoolElement<TEntity> element,
+        string? keyPrefix = null) =>
         from identity in Checkr.Capture(() => identitySelector.Select(element.Value))
         from entity in Checkr.Capture(() =>
             identitySelector.GetById<TEntity>(scope, identity))
         from expected in Checkr.Act(
-            $"Update {entityName}: {mutation.Description}",
+            Key(keyPrefix, $"Update {entityName}: {mutation.Description}"),
             () => ApplyAndPersist(mutation, entity))
         from reloaded in Checkr.Capture(() =>
             identitySelector.GetById<TEntity>(scope, identity))
@@ -39,8 +40,13 @@ where TEntity : class
                     report => [
                         $"Expected: {report.IntroduceThis(expected[index])}",
                         $"Actual:   {report.IntroduceThis(check.GetValue(reloaded))}"])))
-        from stored in element.Replace(reloaded)
+        from stored in element.Id < 0
+            ? Checkr.Capture(() => Case.Closed)
+            : element.Replace(reloaded)
         select Case.Closed;
+
+    private static string Key(string? prefix, string key) =>
+        prefix is null ? key : $"{prefix}: {key}";
 
     private IReadOnlyList<object?> ApplyAndPersist(
         DomainMutation<TEntity> mutation,

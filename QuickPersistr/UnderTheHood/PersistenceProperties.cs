@@ -149,7 +149,8 @@ where TEntity : class
     {
         oneToManies.Add(many(new HasManyFrom<TEntity, TReader, TId>(
             identitySelector,
-            entityShrinkers)));
+            entityShrinkers,
+            $"{typeof(TEntity).Name}.HasMany[{oneToManies.Count}]")));
         return this;
     }
 
@@ -158,7 +159,8 @@ where TEntity : class
     {
         oneToOnes.Add(one(new HasOneFrom<TEntity, TReader, TId>(
             identitySelector,
-            entityShrinkers)));
+            entityShrinkers,
+            $"{typeof(TEntity).Name}.HasOne[{oneToOnes.Count}]")));
         return this;
     }
 

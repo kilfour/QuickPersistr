@@ -117,6 +117,7 @@ The DSL also supports:
 - custom property equality;
 - explicit domain-method mutations;
 - one-to-one and one-to-many add, remove, clear, replace, and reassignment scenarios;
+- dependent property checks executed through their parent relationship;
 - rejected creates, updates, and deletes, including verification that existing state was preserved;
 - optimistic-concurrency conflicts through concurrent sessions;
 - custom shrinkers and generation configuration.
@@ -201,6 +202,37 @@ Entity
 ```
 
 Only declare properties and behaviours that belong to the persistence contract. Navigation properties that are configured separately can be excluded from automatic generation with `DomainConfiguration(...)` and then exercised explicitly through `HasOne` or `HasMany`.
+
+### Aggregate roots and dependent entities
+
+Specifications passed to `.Entities(...)` are treated as independently persistable roots. QuickPersistr runs their standalone create, read, update, and delete scenarios.
+
+A specification passed to `.From(...)` inside `HasOne` or `HasMany` is a full dependent contract. QuickPersistr creates the child through the parent relationship, commits, opens fresh sessions, and runs the same configured behaviors as it does for a root: generated and unique identities, property reads and updates, explicit domain updates, optimistic concurrency, nested relationships, rejected operations, deletion, and `AfterDelete(...)` expectations. Rejected creates are attached through the parent before committing, so required foreign keys remain valid while the intended rejection is tested:
+
+```csharp
+Persistr.Named("Courses")
+    .Scope(() => new CourseScope())
+    .Entities(new CoursePersistence())
+    .Run();
+```
+
+```csharp
+Entity
+    .PrimaryKey(course => course.Id)
+    .HasMany(many => many
+        .From(new StudentPersistence())
+        .Add((course, student) => course.Students.Add(student))
+        .Reload((reader, id) => reader.Query(db => db.Courses
+            .Include(course => course.Students)
+            .Single(course => course.Id == id)))
+        .Contains((course, student) => course.Students.Any(
+            candidate => candidate.Id == student.Id)))
+    .Persist();
+```
+
+Here `StudentPersistence` is executed completely after the course persists its students. Generated updates mutate only properties declared by the child specification, leaving relationship-owned foreign keys alone; explicit child mutations still do exactly what their specification declares. Child relationships are evaluated recursively. The destructive child-delete phase runs only after the enclosing parent relationship expectations succeed, keeping failure shrinking reproducible.
+
+Do not also pass the child to `.Entities(...)` unless it can validly be created without its parent. Parent removal, clearing, replacement, and reassignment remain relationship behaviors, while the child's configured delete and post-delete contract is checked independently through the persisted dependent.
 
 ## Development
 

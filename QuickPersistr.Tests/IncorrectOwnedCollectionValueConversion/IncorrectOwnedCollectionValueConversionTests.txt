@@ -7,7 +7,9 @@
  ------------------------------------------------------------
   Executed: Create Course
    - Entity = Course-1
-   - Entity = { Days: [ { Day: Wednesday, Mode: RemoteLearning } ] }
+   - Entity = { Days: [ { Day: Wednesday, Mode: RemoteLearning } ], IsDeleted: false, Id: { Value: 303eeffc-c52b-4a24-adfb-11e374ad58b5 } }
+   - WARNING: Read-only member of type 'Boolean' at 'Entity.IsDeleted' has no configured traversal and was retained as an opaque value.
+   - WARNING: Read-only member of type 'Id`1' at 'Entity.Id' has no configured traversal and was retained as an opaque value.
  ------------------------------------------------------------
   Executed: Read Course
    - Entity = Course-1

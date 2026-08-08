@@ -1,0 +1,25 @@
+ ------------------------------------------------------------
+ 1 Run
+ ------------------------------------------------------------
+ Passed Expectations
+ - Can Create Person: 1x
+ - Can Read Person.Id: 1x
+ - Can Read Person.Name: 1x
+ - Can Update Person.Name: 1x
+ - Person Can Set Passport: 3x
+ - Person Can Replace Passport: 3x
+ - Person Releases Previous Passport: 3x
+ - Can Create Passport: 3x
+ - Can Create Several Passport: 3x
+ - Can Create Unique Passport.Id: 3x
+ - Can Read Passport.Id: 3x
+ - Can Read Passport.Number: 3x
+ - Can Update Passport.Number: 3x
+ - Person Can Clear Passport: 2x
+ - Can Delete Passport: 3x
+ - Source Person Releases Passport: 1x
+ - Destination Person Receives Passport: 1x
+ - Can Delete Person: 1x
+ - Can Create Several Person: 1x
+ - Can Create Unique Person.Id: 1x
+ ------------------------------------------------------------

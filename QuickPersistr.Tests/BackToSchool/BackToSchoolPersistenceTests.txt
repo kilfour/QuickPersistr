@@ -9,20 +9,20 @@
  - Can Update Course.Title: 1x
  - Can Update Course.Description: 1x
  - Course Can Add Student: 1x
+ - Can Create Student: 2x
+ - Can Create Several Student: 2x
+ - Can Create Unique Student.Id: 2x
+ - Can Read Student.Id: 2x
+ - Can Read Student.Name: 2x
+ - Can Update Student.Name: 2x
  - Course Can Remove Student: 1x
  - Course Retains Other Student: 1x
  - Source Course Releases Student: 1x
  - Destination Course Receives Student: 1x
  - Source Course Retains Other Student: 1x
  - Course Can Clear Student: 1x
+ - Can Delete Student: 2x
  - Can Delete Course: 1x
  - Can Create Several Course: 1x
  - Can Create Unique Course.Id: 1x
- - Can Create Student: 1x
- - Can Read Student.Id: 1x
- - Can Read Student.Name: 1x
- - Can Update Student.Name: 1x
- - Can Delete Student: 1x
- - Can Create Several Student: 1x
- - Can Create Unique Student.Id: 1x
  ------------------------------------------------------------

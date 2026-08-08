@@ -41,6 +41,13 @@ public class HasOneTests : PersistrTest<HasOneTests>
         Assert.Contains("Person Can Clear Passport", labels);
         Assert.Contains("Source Person Releases Passport", labels);
         Assert.Contains("Destination Person Receives Passport", labels);
+        Assert.Contains("Can Create Passport", labels);
+        Assert.Contains("Can Create Several Passport", labels);
+        Assert.Contains("Can Create Unique Passport.Id", labels);
+        Assert.Contains("Can Read Passport.Id", labels);
+        Assert.Contains("Can Read Passport.Number", labels);
+        Assert.Contains("Can Update Passport.Number", labels);
+        Assert.Contains("Can Delete Passport", labels);
     }
 }
 

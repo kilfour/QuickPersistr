@@ -37,10 +37,10 @@ public class RemoveAllInsteadOfOneTests : PersistrTest<RemoveAllInsteadOfOneTest
         Assert.Equal("Actual:   [ ]", article.FailingExpectationMessages()[1]);
         Assert.Equal("", article.VerifyFailed());
         Assert.Equal(2, article.Total().Executions());
-        Assert.Equal(4, article.Total().Actions());
+        Assert.Equal(6, article.Total().Actions());
         Assert.Equal(2, article.Total().Inputs());
         Assert.Equal(2, article.Total().PoolTraces());
-        Assert.Equal(5, article.Total().PassedExpectations());
+        Assert.Equal(11, article.Total().PassedExpectations());
         Assert.Equal(1, article.Execution(1).Read().ExecutionId);
         Assert.Equal("Create Course", article.Execution(1).Action(1).Read().Label);
         Assert.Equal("Entity", article.Execution(1).Input(1).Read().Label);
@@ -55,10 +55,16 @@ public class RemoveAllInsteadOfOneTests : PersistrTest<RemoveAllInsteadOfOneTest
         Assert.Equal("Can Create Course", article.PassedExpectation(1).Read().Label);
         Assert.Equal("Can Read Course.Id", article.PassedExpectation(2).Read().Label);
         Assert.Equal("Course Can Add Student", article.PassedExpectation(3).Read().Label);
-        Assert.Equal("Course Can Remove Student", article.PassedExpectation(4).Read().Label);
-        Assert.Equal("Course Can Clear Student", article.PassedExpectation(5).Read().Label);
+        Assert.Equal("Can Create Student", article.PassedExpectation(4).Read().Label);
+        Assert.Equal("Can Create Several Student", article.PassedExpectation(5).Read().Label);
+        Assert.Equal("Can Create Unique Student.Id", article.PassedExpectation(6).Read().Label);
+        Assert.Equal("Can Read Student.Id", article.PassedExpectation(7).Read().Label);
+        Assert.Equal("Can Read Student.Name", article.PassedExpectation(8).Read().Label);
+        Assert.Equal("Can Update Student.Name", article.PassedExpectation(9).Read().Label);
+        Assert.Equal("Course Can Remove Student", article.PassedExpectation(10).Read().Label);
+        Assert.Equal("Course Can Clear Student", article.PassedExpectation(11).Read().Label);
         Assert.All(
-            Enumerable.Range(1, 5),
+            Enumerable.Range(1, 11),
             index => Assert.Equal(1, article.PassedExpectation(index).Read().TimesPassed));
     }
 }

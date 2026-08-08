@@ -7,6 +7,7 @@
   Executed: Create Thingamajig
    - Entity = Thingamajig-1
    - Entity = { Id: { Value: 0 } }
+   - WARNING: Can't shrink type 'ThingamajigId' at input 'Entity.Id'.
  =================================================
   !! Expectation Failed: Can Create Thingamajig
        Expected: Non-default Thingamajig.Id

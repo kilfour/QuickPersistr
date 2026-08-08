@@ -16,14 +16,16 @@ where TEntity : class
 
     public CheckrOf<Case> Create(
         RejectedOperation<TEntity> operation,
-        FuzzrOf<TEntity> creator) =>
+        FuzzrOf<TEntity> creator,
+        Action<TEntity>? add = null,
+        string? keyPrefix = null) =>
         from entity in Checkr.Input(
-            "Rejected Entity",
+            Key(keyPrefix, "Rejected Entity", operation.Description),
             creator,
             [.. entityShrinkers])
         from rejected in Checkr.ActCarefully(
-            $"Attempt Rejected Create {entityName}: {operation.Description}",
-            () => AttemptCreate(operation, entity))
+            Key(keyPrefix, $"Attempt Rejected Create {entityName}: {operation.Description}"),
+            () => AttemptCreate(operation, entity, add))
         from rejectionExpected in operation.ExpectRejection(
             $"Rejects Creating {entityName}: {operation.Description}",
             rejected)
@@ -34,14 +36,24 @@ where TEntity : class
             () => reloaded is null)
         select Case.Closed;
 
+    private static string Key(
+        string? prefix,
+        string key,
+        string description) =>
+        prefix is null ? key : $"{prefix}: {key}: {description}";
+
+    private static string Key(string? prefix, string key) =>
+        prefix is null ? key : $"{prefix}: {key}";
+
     public CheckrOf<Case> Update(
         RejectedOperation<TEntity> operation,
-        PoolElement<TEntity> element) =>
+        PoolElement<TEntity> element,
+        string? keyPrefix = null) =>
         from entity in Checkr.Capture(() =>
             identitySelector.GetById<TEntity>(scope, identitySelector.Select(element.Value)))
         from before in Checkr.Capture(() => Snapshot(entity))
         from rejected in Checkr.ActCarefully(
-            $"Attempt Rejected Update {entityName}: {operation.Description}",
+            Key(keyPrefix, $"Attempt Rejected Update {entityName}: {operation.Description}"),
             () => AttemptUpdate(operation, entity))
         from rejectionExpected in operation.ExpectRejection(
             $"Rejects Updating {entityName}: {operation.Description}",
@@ -49,17 +61,20 @@ where TEntity : class
         from reloaded in Checkr.Capture(() =>
             identitySelector.GetById<TEntity>(scope, before.Identity))
         from unchanged in Preserves("Update", before, reloaded)
-        from stored in element.Replace(reloaded)
+        from stored in element.Id < 0
+            ? Checkr.Capture(() => Case.Closed)
+            : element.Replace(reloaded)
         select Case.Closed;
 
     public CheckrOf<Case> Delete(
         RejectedOperation<TEntity> operation,
-        PoolElement<TEntity> element) =>
+        PoolElement<TEntity> element,
+        string? keyPrefix = null) =>
         from entity in Checkr.Capture(() =>
             identitySelector.GetById<TEntity>(scope, identitySelector.Select(element.Value)))
         from before in Checkr.Capture(() => Snapshot(entity))
         from rejected in Checkr.ActCarefully(
-            $"Attempt Rejected Delete {entityName}: {operation.Description}",
+            Key(keyPrefix, $"Attempt Rejected Delete {entityName}: {operation.Description}"),
             () => AttemptDelete(operation, entity, before.Identity))
         from rejectionExpected in operation.ExpectRejection(
             $"Rejects Deleting {entityName}: {operation.Description}",
@@ -67,7 +82,9 @@ where TEntity : class
         from reloaded in Checkr.Capture(() =>
             identitySelector.GetById<TEntity>(scope, before.Identity))
         from unchanged in Preserves("Delete", before, reloaded)
-        from stored in element.Replace(reloaded)
+        from stored in element.Id < 0
+            ? Checkr.Capture(() => Case.Closed)
+            : element.Replace(reloaded)
         select Case.Closed;
 
     private CheckrOf<Case> Preserves(
@@ -99,11 +116,17 @@ where TEntity : class
             identitySelector.Select(entity),
             propertyChecks.Select(check => check.GetValue(entity)).ToList());
 
-    private void AttemptCreate(RejectedOperation<TEntity> operation, TEntity entity) =>
+    private void AttemptCreate(
+        RejectedOperation<TEntity> operation,
+        TEntity entity,
+        Action<TEntity>? add) =>
         Attempt(() =>
         {
             operation.Attempt(entity);
-            scope.Add(entity);
+            if (add is null)
+                scope.Add(entity);
+            else
+                add(entity);
         });
 
     private void AttemptUpdate(RejectedOperation<TEntity> operation, TEntity entity) =>

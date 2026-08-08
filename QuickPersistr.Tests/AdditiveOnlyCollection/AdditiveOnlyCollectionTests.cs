@@ -27,16 +27,23 @@ public class AdditiveOnlyCollectionTests : PersistrTest<AdditiveOnlyCollectionTe
     {
         Assert.Equal("", article.FailureDescription());
         Assert.Equal("", article.VerifyFailed());
-        Assert.Equal(8, article.Total().PassedExpectations());
+        Assert.Equal(15, article.Total().PassedExpectations());
         Assert.Equal(
             "Playlist Can Add Track",
             article.PassedExpectation(5).Read().Label);
+        Assert.Equal("Can Create Track", article.PassedExpectation(6).Read().Label);
+        Assert.Equal("Can Create Several Track", article.PassedExpectation(7).Read().Label);
+        Assert.Equal("Can Create Unique Track.Id", article.PassedExpectation(8).Read().Label);
+        Assert.Equal("Can Read Track.Id", article.PassedExpectation(9).Read().Label);
+        Assert.Equal("Can Read Track.Name", article.PassedExpectation(10).Read().Label);
+        Assert.Equal("Can Update Track.Name", article.PassedExpectation(11).Read().Label);
+        Assert.Equal("Can Delete Track", article.PassedExpectation(12).Read().Label);
         Assert.DoesNotContain(
-            Enumerable.Range(1, 8)
+            Enumerable.Range(1, 15)
                 .Select(index => article.PassedExpectation(index).Read().Label),
             label => label.Contains("Remove") || label.Contains("Clear"));
         Assert.All(
-            Enumerable.Range(1, 8),
+            Enumerable.Range(1, 15),
             index => Assert.Equal(1, article.PassedExpectation(index).Read().TimesPassed));
     }
 }

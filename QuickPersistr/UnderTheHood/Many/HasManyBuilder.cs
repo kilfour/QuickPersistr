@@ -5,7 +5,8 @@ namespace QuickPersistr.UnderTheHood.Many;
 
 public class HasManyFrom<TEntity, TReader, TId>(
     IdentitySelector<TEntity, TId> identitySelector,
-    IReadOnlyList<Shrinker> entityShrinkers)
+    IReadOnlyList<Shrinker> entityShrinkers,
+    string relationshipKey)
 where TEntity : class
 {
     public HasManyAdd<TEntity, TReader, TChild, TId> From<TChild>(
@@ -13,8 +14,9 @@ where TEntity : class
     where TChild : class =>
         new(new(
             identitySelector,
-            childPersistence.Define().GetCreator<TChild>(),
-            entityShrinkers));
+            childPersistence.Define(),
+            entityShrinkers,
+            relationshipKey));
 }
 
 public class HasManyAdd<TEntity, TReader, TChild, TId>(

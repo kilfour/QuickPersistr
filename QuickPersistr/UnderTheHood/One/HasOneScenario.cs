@@ -15,15 +15,31 @@ where TChild : class
     public CheckrOf<Case> Check(PoolElement<TEntity> element) =>
         from set in SetChild(element)
         from replaced in ReplaceChild(set)
-        from sourceForClear in ReassignIfRequested(replaced)
+        from relationship in Checkr.Capture(() => new SetRelationship(
+            replaced.SourceId,
+            replaced.Active,
+            replaced.Source,
+            replaced.Nested,
+            replaced.ContractEligible))
+        from sourceForClear in ReassignIfRequested(relationship)
         from cleared in ClearChild(sourceForClear)
-        from stored in element.Replace(cleared)
+        from deletedChild in CheckChildDelete(replaced, cleared.ContractEligible)
+        from current in Checkr.Capture(
+            () => definition.Reload(scope.Reader, replaced.SourceId))
+        from stored in element.Id < 0
+            ? Checkr.Capture(() => Case.Closed)
+            : element.Replace(current)
         select Case.Closed;
 
     public CheckrOf<Case> CheckAdditive(PoolElement<TEntity> element) =>
         from set in SetChild(element)
         from replaced in ReplaceChild(set)
-        from stored in element.Replace(replaced.Source)
+        from deletedChild in CheckChildDelete(replaced, replaced.ContractEligible)
+        from current in Checkr.Capture(
+            () => definition.Reload(scope.Reader, replaced.SourceId))
+        from stored in element.Id < 0
+            ? Checkr.Capture(() => Case.Closed)
+            : element.Replace(current)
         select Case.Closed;
 
     private CheckrOf<SetRelationship> SetChild(PoolElement<TEntity> element) =>
@@ -31,8 +47,8 @@ where TChild : class
             () => definition.Identity.Select(element.Value))
         from source in Checkr.Capture(
             () => definition.Identity.GetById<TEntity>(scope, sourceId))
-        from child in Checkr.Input("Child", definition.ChildFuzzr)
-        from set in Checkr.Act("Set Child", () =>
+        from child in Checkr.Input(Key(element.Id < 0, "Child"), definition.ChildFuzzr)
+        from set in Checkr.Act(Key(element.Id < 0, "Set Child"), () =>
         {
             definition.Set(source, child);
             CommitAndStartNewSession();
@@ -44,11 +60,18 @@ where TChild : class
             reloaded,
             child,
             expectedPresent: true)
-        select new SetRelationship(sourceId, child, reloaded);
+        select new SetRelationship(
+            sourceId,
+            child,
+            reloaded,
+            element.Id < 0,
+            reloaded is not null && definition.Contains(reloaded, child));
 
-    private CheckrOf<SetRelationship> ReplaceChild(SetRelationship set) =>
-        from replacement in Checkr.Input("Replacement Child", definition.ChildFuzzr)
-        from replace in Checkr.Act("Replace Child", () =>
+    private CheckrOf<ReplacedRelationship> ReplaceChild(SetRelationship set) =>
+        from replacement in Checkr.Input(
+            Key(set.Nested, "Replacement Child"),
+            definition.ChildFuzzr)
+        from replace in Checkr.Act(Key(set.Nested, "Replace Child"), () =>
         {
             definition.Set(set.Source, replacement);
             CommitAndStartNewSession();
@@ -65,14 +88,58 @@ where TChild : class
             reloaded,
             set.Child,
             expectedPresent: false)
-        select new SetRelationship(set.SourceId, replacement, reloaded);
+        from childContract in set.ContractEligible &&
+            reloaded is not null &&
+            definition.Contains(reloaded, replacement) &&
+            !definition.Contains(reloaded, set.Child)
+            ? definition.ChildSpecification.GetNestedCheckr(
+                scope,
+                new[] { set.Child, replacement },
+                replacement,
+                child => definition.Set(
+                    definition.Reload(scope.Reader, set.SourceId),
+                    child),
+                definition.RelationshipKey)
+            : Checkr.Capture(() => Case.Closed)
+        from current in Checkr.Capture(
+            () => definition.Reload(scope.Reader, set.SourceId))
+        select new ReplacedRelationship(
+            set.SourceId,
+            new[] { set.Child, replacement },
+            replacement,
+            current,
+            set.Nested,
+            set.ContractEligible &&
+                reloaded is not null &&
+                definition.Contains(reloaded, replacement) &&
+                !definition.Contains(reloaded, set.Child));
+
+    private CheckrOf<ChildContractResult> CheckChildDelete(
+        ReplacedRelationship replaced,
+        bool contractEligible) =>
+        from childContract in contractEligible
+            ? definition.ChildSpecification.GetNestedDeleteCheckr(
+                scope,
+                replaced.Active,
+                child => definition.Set(
+                    definition.Reload(scope.Reader, replaced.SourceId),
+                    child),
+                definition.RelationshipKey)
+            : Checkr.Capture(() => Case.Closed)
+        from current in Checkr.Capture(
+            () => definition.Reload(scope.Reader, replaced.SourceId))
+        select new ChildContractResult(replaced.SourceId, current, replaced.Nested);
 
     private CheckrOf<SourceForClear> ReassignIfRequested(SetRelationship set)
     {
         if (definition.Reassign is null)
         {
             return Checkr.Capture(() =>
-                new SourceForClear(set.SourceId, set.Source));
+                new SourceForClear(
+                    set.SourceId,
+                    set.Source,
+                    set.Nested,
+                    set.ContractEligible));
         }
 
         return Reassign(set, definition.Reassign);
@@ -82,11 +149,11 @@ where TChild : class
         SetRelationship added,
         Action<TEntity, TEntity, TChild> reassign) =>
         from destination in Checkr.Input(
-            "Destination",
+            Key(added.Nested, "Destination"),
             EntityCreator,
             [.. definition.EntityShrinkers])
         from createDestination in Checkr.Act(
-            $"Create Destination {entityName}",
+            Key(added.Nested, $"Create Destination {entityName}"),
             () =>
             {
                 scope.Add(destination);
@@ -98,7 +165,7 @@ where TChild : class
             () => definition.Reload(scope.Reader, added.SourceId))
         from destinationForMove in Checkr.Capture(
             () => definition.Reload(scope.Reader, destinationId))
-        from move in Checkr.Act("Reassign Child", () =>
+        from move in Checkr.Act(Key(added.Nested, "Reassign Child"), () =>
         {
             reassign(sourceForMove, destinationForMove, added.Child);
             CommitAndStartNewSession();
@@ -119,10 +186,16 @@ where TChild : class
             expectedPresent: true)
         select new SourceForClear(
             destinationId,
-            reloadedDestination);
+            reloadedDestination,
+            added.Nested,
+            added.ContractEligible &&
+                reloadedSource is not null &&
+                reloadedDestination is not null &&
+                !definition.Contains(reloadedSource, added.Child) &&
+                definition.Contains(reloadedDestination, added.Child));
 
-    private CheckrOf<TEntity> ClearChild(SourceForClear source) =>
-        from clear in Checkr.Act("Clear Child", () =>
+    private CheckrOf<ClearedRelationship> ClearChild(SourceForClear source) =>
+        from clear in Checkr.Act(Key(source.Nested, "Clear Child"), () =>
         {
             definition.Clear!(source.Source);
             CommitAndStartNewSession();
@@ -132,7 +205,11 @@ where TChild : class
         from canClear in Checkr.Expect(
             $"{entityName} Can Clear {childEntityName}",
             () => definition.Empty!(reloaded))
-        select reloaded;
+        select new ClearedRelationship(
+            reloaded,
+            source.ContractEligible &&
+                reloaded is not null &&
+                definition.Empty!(reloaded));
 
     private CheckrOf<Case> ExpectPresence(
         string label,
@@ -159,7 +236,31 @@ where TChild : class
 
     private static string Presence(bool present) => present ? "present" : "absent";
 
-    private record SetRelationship(TId SourceId, TChild Child, TEntity Source);
+    private string Key(bool nested, string key) =>
+        nested ? $"{definition.RelationshipKey}: {key}" : key;
 
-    private record SourceForClear(TId SourceId, TEntity Source);
+    private record SetRelationship(
+        TId SourceId,
+        TChild Child,
+        TEntity Source,
+        bool Nested,
+        bool ContractEligible);
+
+    private record ReplacedRelationship(
+        TId SourceId,
+        IReadOnlyList<TChild> Created,
+        TChild Active,
+        TEntity Source,
+        bool Nested,
+        bool ContractEligible);
+
+    private record ChildContractResult(TId SourceId, TEntity Source, bool Nested);
+
+    private record SourceForClear(
+        TId SourceId,
+        TEntity Source,
+        bool Nested,
+        bool ContractEligible);
+
+    private record ClearedRelationship(TEntity Source, bool ContractEligible);
 }

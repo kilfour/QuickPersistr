@@ -2,7 +2,7 @@
  Test:                    Example
  Location:                RemoveAllInsteadOfOneTests.cs:68:1
  Original failing run:    4 executions
- Minimal failing case:    2 executions (after 13 shrinks)
+ Minimal failing case:    2 executions (after 16 shrinks)
  Seed:                    751926438
  ------------------------------------------------------------
   Executed: Create Course
@@ -10,7 +10,7 @@
    - Entity = { Title: "uqbi", Description: "olvqyi" }
      Redux    { Title: "", Description: "" }
  ------------------------------------------------------------
-  Executed: Add Children, Clear Children, Remove Child
+  Executed: Add Children, Clear Children, Course.HasMany[0]: Read Student, Course.HasMany[0]: Update Student, Remove Child
    - Entity   = Course-1
    - Children = [ _, _ ]
  =======================================================
@@ -22,6 +22,12 @@
  - Can Create Course: 1x
  - Can Read Course.Id: 1x
  - Course Can Add Student: 1x
+ - Can Create Student: 1x
+ - Can Create Several Student: 1x
+ - Can Create Unique Student.Id: 1x
+ - Can Read Student.Id: 1x
+ - Can Read Student.Name: 1x
+ - Can Update Student.Name: 1x
  - Course Can Remove Student: 1x
  - Course Can Clear Student: 1x
  ------------------------------------------------------------
