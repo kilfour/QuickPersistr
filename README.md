@@ -259,7 +259,7 @@ Add `-Publish` to push the packages to NuGet. The script reads `NUGET_API_KEY` f
 
 ## Dependencies
 
-- [QuickCheckr](https://github.com/kilfour/QuickCheckr): stateful property-based testing, behavioural shrinking, and failure reports.
+- QuickCheckr: stateful property-based testing, behavioural shrinking, and failure reports.
 - [QuickFuzzr](https://github.com/kilfour/QuickFuzzr): generated entities, values, and domain configuration.
 
 EF Core and SQLite are used by the test suite through optional adapter projects; they are not required by the QuickPersistr library itself. PostgreSQL support is supplied through the optional Npgsql-based adapter and requires an external PostgreSQL server at runtime.
